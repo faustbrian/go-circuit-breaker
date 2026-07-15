@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: stable
+          cache: true
+      - name: Install pinned quality tools
+        run: make tools
+      - name: Verify release
+        run: make check
+      - name: Build reproducible source archives
+        run: |
+          git archive --format=tar.gz --prefix="go-circuit-breaker-${GITHUB_REF_NAME}/" -o "go-circuit-breaker-${GITHUB_REF_NAME}.tar.gz" "${GITHUB_REF_NAME}"
+          git archive --format=zip --prefix="go-circuit-breaker-${GITHUB_REF_NAME}/" -o "go-circuit-breaker-${GITHUB_REF_NAME}.zip" "${GITHUB_REF_NAME}"
+          sha256sum go-circuit-breaker-* > SHA256SUMS
+      - uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f # v3.2.0
+        with:
+          subject-path: |
+            go-circuit-breaker-*.tar.gz
+            go-circuit-breaker-*.zip
+            SHA256SUMS
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" go-circuit-breaker-* SHA256SUMS --verify-tag --generate-notes
