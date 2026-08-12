@@ -30,7 +30,7 @@ jobs:
           git archive --format=tar.gz --prefix="go-circuit-breaker-${GITHUB_REF_NAME}/" -o "go-circuit-breaker-${GITHUB_REF_NAME}.tar.gz" "${GITHUB_REF_NAME}"
           git archive --format=zip --prefix="go-circuit-breaker-${GITHUB_REF_NAME}/" -o "go-circuit-breaker-${GITHUB_REF_NAME}.zip" "${GITHUB_REF_NAME}"
           sha256sum go-circuit-breaker-* > SHA256SUMS
-      - uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f # v3.2.0
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: |
             go-circuit-breaker-*.tar.gz
