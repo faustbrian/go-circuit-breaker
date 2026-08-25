@@ -1,4 +1,4 @@
-github.com/faustbrian/go-circuit-breaker v1.0.0 h1:kNEZUFuSo/rml1fiEfsQ0A1F/vDrHOF6Hgvw6CUs730=
+github.com/faustbrian/go-circuit-breaker v1.0.0 h1:BSn+JlKa3fkYATK9mgkTXWNxKDV9WOC4Yt35g/NaGrE=
 github.com/faustbrian/go-circuit-breaker v1.0.0/go.mod h1:tJ8Xfrv6DG0NiGErqKERXkiBLsyNzOIZ5MZVoD36jEU=
-github.com/faustbrian/go-jsonrpc v1.0.0 h1:6KbCDy8SHxxsBNdJ0fy+8yK/dSrs+Z+Di0iZk9gxp3k=
+github.com/faustbrian/go-jsonrpc v1.0.0 h1:tmr9w3TJW9Bi8htMbnYKXYqN4YBkAWevcKZarm61SK4=
 github.com/faustbrian/go-jsonrpc v1.0.0/go.mod h1:gdYA/wi8eAeptM4Lf9qwPA6eImChPa2Ng9/+/UvpOPQ=
