@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/golib/pkg/circuit-breaker/window"
+	"github.com/faustbrian/go-circuit-breaker/window"
 )
 
 func BenchmarkCountRollover(b *testing.B) {

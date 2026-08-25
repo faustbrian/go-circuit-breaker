@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	breaker "github.com/faustbrian/golib/pkg/circuit-breaker"
-	"github.com/faustbrian/golib/pkg/circuit-breaker/window"
+	breaker "github.com/faustbrian/go-circuit-breaker"
+	"github.com/faustbrian/go-circuit-breaker/window"
 )
 
 func TestNewRejectsNonFinitePolicyValues(t *testing.T) {

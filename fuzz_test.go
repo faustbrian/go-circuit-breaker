@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	breaker "github.com/faustbrian/golib/pkg/circuit-breaker"
-	"github.com/faustbrian/golib/pkg/circuit-breaker/breakertest"
+	breaker "github.com/faustbrian/go-circuit-breaker"
+	"github.com/faustbrian/go-circuit-breaker/breakertest"
 )
 
 func FuzzConfigurationNeverPanics(f *testing.F) {

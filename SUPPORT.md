@@ -1,16 +1,13 @@
-# Support and compatibility
+# Support
 
-Use GitHub issues for reproducible defects and focused feature proposals. Use
-GitHub discussions, when enabled, for adoption questions. Security reports must
-follow [SECURITY.md](SECURITY.md).
+Use GitHub issues for reproducible defects, documentation gaps, and bounded
+feature proposals. Include the module path and version, Go version, platform,
+minimal reproduction, expected behavior, actual behavior, and relevant
+non-secret logs.
 
-The module follows Semantic Versioning. Go 1.24 is the minimum supported
-toolchain for v1. The latest two stable Go releases are tested when practical.
-Exported APIs, defaults, transition behavior, timing, classification, snapshot
-fields, and sentinel identity are compatibility surfaces. Deprecation precedes
-removal except for urgent security/correctness issues.
+Use GitHub Discussions for adoption questions and design exploration. Use the
+private process in [`SECURITY.md`](SECURITY.md) for vulnerabilities.
 
-Bug reports should include module/Go versions, configuration without secrets,
-the exact state sequence, a minimal reproducer, and race-detector output where
-concurrency is involved. This open source project provides no guaranteed
-response time or production support SLA.
+Support covers released module versions according to
+[`COMPATIBILITY.md`](COMPATIBILITY.md). Unreleased main-branch behavior may
+change while remediation gates are incomplete.

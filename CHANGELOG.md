@@ -7,12 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-25
+
 ### Documentation
 
 - Link the package README to the repository-wide Golib documentation portal.
 
 ### Changed
 
+- Publish the module from its standalone `github.com/faustbrian/go-circuit-breaker` identity while preserving its documented API and behavior.
 - Replace the no-release compatibility bypass with a pinned exported API
   baseline checked on every complete module run.
 
@@ -164,3 +167,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   counters.
 - Tagged compatibility checks install a pinned module-aware `apidiff` and
   compare with the prior release instead of the current tag itself.
+
+[Unreleased]: https://github.com/faustbrian/go-circuit-breaker/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/faustbrian/go-circuit-breaker/releases/tag/v1.0.0

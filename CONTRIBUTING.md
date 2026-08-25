@@ -1,22 +1,55 @@
 # Contributing
 
-Use a conventional or Linear-style branch from `main`, add a changelog entry
-for every implementation change, and preserve the protocol-neutral boundary.
-Behavior changes require a failing regression or model counterexample first.
+## Before Editing
 
-Before opening a pull request:
+1. Read [`AGENTS.md`](AGENTS.md) and the affected module's goals and docs.
+2. Run `make inventory` and the narrow baseline gate for the module.
+3. Identify owned dependencies and reverse dependants in `modules.json`.
+4. Preserve unrelated work and generated/corpus provenance.
 
-```sh
-make tools
-make check
-actionlint .github/workflows/*.yml
+## Changes
+
+Keep commits focused and conventional. Update every affected changelog with
+the behavior and migration impact. Public API changes require compatibility
+evidence and documentation. Specification behavior requires a decision record,
+fixture coverage, and interoperability evidence.
+
+New direct dependencies and dependency updates must follow the
+[dependency governance policy](docs/dependency-governance.md). Package-local
+update bots are forbidden; the root policy owns every module and action update.
+
+Specification-backed changes must follow the
+[specification governance contract](docs/specification-governance.md), update
+the affected stable decision entries, and complete the Specification Decisions
+section of the pull request template. An unresolved interpretation or stale
+source pin is release-blocking; peer behavior cannot silently select policy.
+
+Do not add package-local workflows, permanent replacements, machine-specific
+paths, bypass flags, broad mutation exclusions, or aggregate quality metrics
+that hide a failing package.
+
+## Verification
+
+Run during development:
+
+```bash
+make inventory
+make specification-decisions
+make check MODULES=pkg/<library>
 ```
 
-Pull requests must explain the dependency failure mode, caller/core ownership,
-state or compatibility impact, and verification evidence. New settings must be
-finite, validated, deterministic under an injected clock/random source, and
-covered at boundaries. Do not introduce retries, timeouts, fallbacks, a global
-registry, distributed state, protocol policy, unbounded storage, `unsafe`, cgo,
-or hidden runtime hooks into core.
+Before submitting a repository-wide change:
 
-By participating, contributors agree to follow [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+```bash
+make ci-changed BASE=origin/main
+```
+
+The full scheduled and release gate is `make ci`. Report every unavailable or
+failing command; do not describe partial results as release-ready.
+
+## Adding A Module
+
+Follow [module lifecycle procedures](docs/module-lifecycle.md). New modules
+require an explicit purpose, ownership boundary, dependency review, package
+catalog entry, full quality gates, documentation, changelog, license, security
+policy, compatibility plan, and release dry-run.

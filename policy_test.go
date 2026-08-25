@@ -3,7 +3,7 @@ package breaker
 import (
 	"testing"
 
-	"github.com/faustbrian/golib/pkg/circuit-breaker/window"
+	"github.com/faustbrian/go-circuit-breaker/window"
 )
 
 func TestOpeningDecisionTruthTable(t *testing.T) {

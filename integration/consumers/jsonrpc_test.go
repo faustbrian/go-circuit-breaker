@@ -6,8 +6,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	breaker "github.com/faustbrian/golib/pkg/circuit-breaker"
-	jsonrpc "github.com/faustbrian/golib/pkg/jsonrpc"
+	breaker "github.com/faustbrian/go-circuit-breaker"
+	jsonrpc "github.com/faustbrian/go-jsonrpc"
 )
 
 func TestJSONRPCClientSeparatesLocalValidationAndTransportFailure(t *testing.T) {

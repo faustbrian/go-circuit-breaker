@@ -24,7 +24,7 @@ run_apidiff() {
 
 cd "$root"
 GOWORK=off run_apidiff -m -w "$current" \
-	github.com/faustbrian/golib/pkg/circuit-breaker
+	github.com/faustbrian/go-circuit-breaker
 GOWORK=off run_apidiff -m -incompatible "$baseline" "$current" >"$report"
 test ! -s "$report" || {
 	cat "$report" >&2

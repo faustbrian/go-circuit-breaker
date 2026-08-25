@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"time"
 
-	windowpkg "github.com/faustbrian/golib/pkg/circuit-breaker/window"
+	windowpkg "github.com/faustbrian/go-circuit-breaker/window"
 )
 
 const (

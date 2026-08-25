@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	breaker "github.com/faustbrian/golib/pkg/circuit-breaker"
+	breaker "github.com/faustbrian/go-circuit-breaker"
 )
 
 func TestNewAcceptsCompletePolicyConfiguration(t *testing.T) {

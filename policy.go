@@ -3,7 +3,7 @@ package breaker
 import (
 	"slices"
 
-	"github.com/faustbrian/golib/pkg/circuit-breaker/window"
+	"github.com/faustbrian/go-circuit-breaker/window"
 )
 
 func openingDecision(

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	breaker "github.com/faustbrian/golib/pkg/circuit-breaker"
+	breaker "github.com/faustbrian/go-circuit-breaker"
 )
 
 // Recorder is a bounded, concurrency-safe transition observer for tests.

@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Until v1 is tagged, security fixes apply to `main`. After v1, the latest minor
+Security fixes apply to the latest stable v1 release and `main`. The latest minor
 release receives fixes; severe issues may receive a patch on the prior minor at
 maintainer discretion.
 

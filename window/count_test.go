@@ -3,7 +3,7 @@ package window_test
 import (
 	"testing"
 
-	"github.com/faustbrian/golib/pkg/circuit-breaker/window"
+	"github.com/faustbrian/go-circuit-breaker/window"
 )
 
 func TestCountRetainsOnlyMostRecentClassifiedOutcomes(t *testing.T) {

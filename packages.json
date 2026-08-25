@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "repository": "github.com/faustbrian/go-circuit-breaker",
+  "packages": [
+    {
+      "module_directory": ".",
+      "directory": ".",
+      "name": "breaker",
+      "import_path": "github.com/faustbrian/go-circuit-breaker",
+      "kind": "public",
+      "production": true,
+      "executable": true,
+      "coverage_required": true,
+      "build_required": true,
+      "build_tags": []
+    },
+    {
+      "module_directory": ".",
+      "directory": "breakertest",
+      "name": "breakertest",
+      "import_path": "github.com/faustbrian/go-circuit-breaker/breakertest",
+      "kind": "test support",
+      "production": false,
+      "executable": true,
+      "coverage_required": false,
+      "build_required": true,
+      "build_tags": []
+    },
+    {
+      "module_directory": ".",
+      "directory": "window",
+      "name": "window",
+      "import_path": "github.com/faustbrian/go-circuit-breaker/window",
+      "kind": "public",
+      "production": true,
+      "executable": true,
+      "coverage_required": true,
+      "build_required": true,
+      "build_tags": []
+    }
+  ]
+}

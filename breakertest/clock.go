@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	breaker "github.com/faustbrian/golib/pkg/circuit-breaker"
+	breaker "github.com/faustbrian/go-circuit-breaker"
 )
 
 // Clock is a manually advanced, concurrency-safe breaker clock.

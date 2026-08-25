@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/golib/pkg/circuit-breaker/breakertest"
+	"github.com/faustbrian/go-circuit-breaker/breakertest"
 )
 
 func TestClockAdvancesAndFiresTimersDeterministically(t *testing.T) {

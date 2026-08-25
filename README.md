@@ -1,5 +1,15 @@
 # circuit-breaker
 
+[![CI](https://github.com/faustbrian/go-circuit-breaker/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/faustbrian/go-circuit-breaker/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/badge/CodeQL-required-blue)](https://github.com/faustbrian/go-circuit-breaker/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-100%25_required-blue)](CONTRIBUTING.md#verification)
+[![Mutation](https://img.shields.io/badge/mutation-100%25_required-blue)](CONTRIBUTING.md#verification)
+[![Documentation](https://img.shields.io/badge/docs-checked_in_CI-blue)](docs/)
+[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-circuit-breaker.svg)](https://pkg.go.dev/github.com/faustbrian/go-circuit-breaker)
+[![Release](https://img.shields.io/github/v/release/faustbrian/go-circuit-breaker?sort=semver)](https://github.com/faustbrian/go-circuit-breaker/releases)
+[![Go](https://img.shields.io/badge/go-1.26.6-00ADD8?logo=go)](https://go.dev/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 `circuit-breaker` is a protocol-neutral, bounded, concurrent circuit breaker
 for Go. It owns admission and dependency-health state. Callers retain control of
 timeouts, retries, fallbacks, request bodies, errors, and protocol policy.
@@ -18,7 +28,7 @@ import (
 	"log"
 	"time"
 
-	breaker "github.com/faustbrian/golib/pkg/circuit-breaker"
+	breaker "github.com/faustbrian/go-circuit-breaker"
 )
 
 func main() {
@@ -101,7 +111,7 @@ totals.
 ## Installation and support
 
 ```sh
-go get github.com/faustbrian/golib/pkg/circuit-breaker
+go get github.com/faustbrian/go-circuit-breaker
 make check
 ```
 
