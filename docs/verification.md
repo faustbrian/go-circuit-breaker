@@ -78,19 +78,17 @@ archives have SHA-256 checksums and GitHub artifact attestations.
 
 ## Compatibility
 
-Go 1.24 is the minimum tested version. Before the first tag, the exported API is
-the v1 baseline. After a prior tag exists, `make compatibility` installs a
+Go 1.24 is the minimum tested version. The exported API is the stable v1
+baseline. `make compatibility` installs a
 pinned `apidiff` through `make tools` and compares the entire prior module with
 the working tree. A tag pointing at the checked-out commit is excluded so a
 release cannot compare itself with itself. Exported types, defaults, state
 transitions, timing, classification, snapshots, and error identity are semantic
 compatibility surfaces.
 
-## Release verdict
+## Assurance summary
 
-The 2026-07-15 audit found and corrected eight high-, two medium-, and one
-low-severity core defect, each behavior correction originating in a failing
-regression. The implementation now has deterministic evidence for core
+The implementation has deterministic evidence for core
 transitions, thresholds, windows, permit terminal paths, classifier outcomes,
 snapshots, observers, and administrative modes. HTTP, `database/sql`, and
 `jsonrpc` integration suites keep protocol policy outside core. The latter
@@ -98,8 +96,8 @@ two run from the nested `integration/consumers` module, which imports core while
 core's production module remains dependency-free. No known core release blocker
 remains.
 
-The 2026-07-16 downstream acceptance run used the concrete `http-client`
-adapter pinned to core commit `7300e65`. It proves that the limiter precedes
+Downstream acceptance through the concrete `http-client` adapter proves that
+the limiter precedes
 admission, one breaker completion owns every bounded retry attempt, discarded
 response bodies close while the final body remains caller-owned, and a
 half-open probe owns its complete retry sequence. It also distinguishes
