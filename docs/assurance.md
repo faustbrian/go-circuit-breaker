@@ -1,6 +1,7 @@
-# Hardening audit report
+# Assurance and findings
 
-This report records the 2026-07-15 hostile-concurrency audit. It complements
+This document records the hostile-concurrency findings and resulting
+guarantees. It complements
 the normative state machine in [design.md](design.md), the policy truth tables
 in [policies.md](policies.md), and the reproducible gates in
 [verification.md](verification.md).

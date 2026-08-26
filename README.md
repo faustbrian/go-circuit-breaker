@@ -104,7 +104,7 @@ totals.
 - [HTTP, RPC, database, queue, storage, and resilience composition](docs/composition.md)
 - [Operations, observability, tuning, incidents, and troubleshooting](docs/operations.md)
 - [State-machine specification, threat model, and linearization](docs/design.md)
-- [Hardening audit, findings, ownership, and proof matrix](docs/hardening-audit.md)
+- [Assurance, findings, ownership, and proof matrix](docs/assurance.md)
 - [Verification, benchmarks, compatibility, and release evidence](docs/verification.md)
 - [Security policy](SECURITY.md) and [contribution guide](CONTRIBUTING.md)
 
@@ -117,8 +117,3 @@ make check
 
 The minimum supported toolchain is Go 1.24. See [SUPPORT.md](SUPPORT.md) for the
 compatibility policy. This project is licensed under the MIT License.
-
-## Ecosystem
-
-Use the [Golib documentation portal](https://github.com/faustbrian/golib/blob/main/docs/index.md)
-to choose companion packages, supported stacks, recipes, and operations guidance.

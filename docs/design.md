@@ -117,7 +117,7 @@ are copied, so callers never observe mutable internal structures.
 | Allocation denial of service | memory exhaustion | validated hard maxima for windows/probes/events |
 
 The finding reproductions and dispositions are recorded in
-[hardening-audit.md](hardening-audit.md). No high- or medium-severity finding
+[assurance.md](assurance.md). No high- or medium-severity finding
 remains open. Operational risks that cannot
 be solved by core—incorrect classification, excessive caller retries, failure
 to close protocol resources, and abandoned permits until TTL—are explicit
