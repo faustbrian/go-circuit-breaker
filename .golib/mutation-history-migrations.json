@@ -42,26 +42,6 @@
       "module": ".",
       "package": "window",
       "report_sha256": "e69af5f1672b2964cc52509ad05e008df79f9d0a6600b5b9350669aaeedcfb16"
-    },
-    {
-      "module": ".",
-      "package": ".",
-      "execution_revision": "c09c5268b1facb88317f933913b2e7cf4377948b",
-      "gate_input_digest": "446e2d027b30887b0e279186a3c7ab13abfd4b60317743bacc451364973b6b03",
-      "replacement_gate_input_digest": "651fd59652956bb8e612415ac454025a689bb7bb174e81f7cb439f7676fa75b1",
-      "gremlins_version": "v0.6.0",
-      "gremlins_verifier_sha256": "9a9499ff68a8dfd49a0be7995590297a8ee563a1aa226bfd8b9361dc53058108",
-      "report_sha256": "efc7efb40a25d52c61a1c61fe193262a10df96228aafb7ec1dfa1d852095c76b"
-    },
-    {
-      "module": ".",
-      "package": "window",
-      "execution_revision": "c09c5268b1facb88317f933913b2e7cf4377948b",
-      "gate_input_digest": "2bbc06bf3ea475fca20043346dc606ec705c56d869199a7926b7a3649cc72129",
-      "replacement_gate_input_digest": "c17a3aa07aaabeb50535e7d5dc2370ca5eb01c30ea11ad09fc9e7b81e2a6d563",
-      "gremlins_version": "v0.6.0",
-      "gremlins_verifier_sha256": "9a9499ff68a8dfd49a0be7995590297a8ee563a1aa226bfd8b9361dc53058108",
-      "report_sha256": "51b02849c42ae475da124ab63555f8df316a2c83a0978d4a0e82f427a01f9355"
     }
   ]
 }
