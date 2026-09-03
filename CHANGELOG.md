@@ -9,10 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Adopt the checksum-verified `go-library-tools` v1.4.0 CLI, schema-v2
+  cohesion metadata, and repository-local `make cohesion` gate without
+  changing the circuit-breaker API or runtime behavior.
+- Pin reusable CI to the immutable W14 workflow and enforce the local cohesion
+  contract in the repository's aggregate gate.
+- Reconcile the integration harness's circuit-breaker and JSON-RPC checksums
+  with their immutable public module identities.
+
 - Replace copied repository tooling with the pinned `go-library-tools` v1.0.13
   contract while retaining package-owned policy and verification evidence.
 
 ### Documentation
+
+- Publish the module's family, selection, ownership, lifecycle, support, and
+  delivery metadata, and link the README to the immutable v1.4.0 ecosystem
+  index and family guidance.
 
 - Align maintained documentation with the stable v1 release contract and
   remove obsolete candidate or verdict wording.

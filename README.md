@@ -108,6 +108,10 @@ totals.
 - [Verification, benchmarks, compatibility, and release evidence](docs/verification.md)
 - [Security policy](SECURITY.md) and [contribution guide](CONTRIBUTING.md)
 
+For ecosystem-wide selection and ownership guidance, see the versioned
+[Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md)
+and its [Resilience family](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/design-language.md#package-families-and-selection).
+
 ## Installation and support
 
 ```sh
