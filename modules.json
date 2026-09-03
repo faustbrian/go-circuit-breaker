@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "repository": "github.com/faustbrian/go-circuit-breaker",
   "go_version": "1.26.6",
   "modules": [
@@ -77,6 +77,90 @@
       "goal_files": [],
       "goal_status": "not-applicable",
       "goal_evidence": [],
+      "cohesion": {
+        "family": "resilience",
+        "secondary_capabilities": [
+          "observability",
+          "resilience-and-admission",
+          "testing-and-conformance"
+        ],
+        "responsibility": "Provide protocol-neutral, bounded circuit-breaker state, dependency-health admission, rolling outcome windows, and explicit permit and observation lifecycles.",
+        "non_goals": [
+          "Own retries, timeouts, fallbacks, request bodies, protocol classification, distributed state, or a default resilience stack."
+        ],
+        "public_package_identifier": "breaker",
+        "primary_entry_packages": [
+          "github.com/faustbrian/go-circuit-breaker"
+        ],
+        "package_selection": {
+          "github.com/faustbrian/go-circuit-breaker": "Use for explicit process-local dependency-health admission with bounded rolling evidence and caller-owned execution policy."
+        },
+        "lifecycle_status": "active",
+        "maturity": "stable",
+        "construction_styles": [
+          "new-config",
+          "plain-function",
+          "validated-value"
+        ],
+        "lifecycle_styles": [
+          "close",
+          "shutdown",
+          "stateless"
+        ],
+        "ownership": {
+          "configuration": "caller",
+          "mutable_inputs": [
+            "borrow",
+            "copy"
+          ],
+          "runtime_resources": "package",
+          "background_work": "package"
+        },
+        "optional_owned_dependencies": [],
+        "adapters": [],
+        "companions": [
+          "github.com/faustbrian/go-adaptive-throttle",
+          "github.com/faustbrian/go-bulkhead",
+          "github.com/faustbrian/go-concurrency-limit",
+          "github.com/faustbrian/go-fault-injection",
+          "github.com/faustbrian/go-hedge",
+          "github.com/faustbrian/go-http-client",
+          "github.com/faustbrian/go-rate-limit",
+          "github.com/faustbrian/go-resilience",
+          "github.com/faustbrian/go-retry",
+          "github.com/faustbrian/go-semaphore"
+        ],
+        "supported_go": {
+          "minimum": "1.26.6",
+          "tested": [
+            "1.26.6"
+          ]
+        },
+        "supported_platforms": [
+          "portable-go"
+        ],
+        "supported_backends": [],
+        "supported_protocols": [],
+        "documentation": {
+          "readme": "README.md",
+          "api": "docs/api.md",
+          "adoption": "docs/composition.md",
+          "security": "SECURITY.md",
+          "compatibility": "COMPATIBILITY.md",
+          "performance": "docs/verification.md",
+          "examples": "example_test.go",
+          "faq": null,
+          "changelog": "CHANGELOG.md",
+          "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-circuit-breaker",
+          "ecosystem_index": "https://github.com/faustbrian/go-library-tools/blob/v1.3.0/docs/ecosystem/README.md"
+        },
+        "known_good_compatibility_sets": [],
+        "delivery": {
+          "implementation": "not-started",
+          "hardening": "not-started",
+          "release": "not-started"
+        }
+      },
       "gates": {
         "api_compatibility": true,
         "benchmarks": true,
@@ -100,6 +184,10 @@
       "lifecycle": "internal",
       "kind": "interoperability harness",
       "releasable": false,
+      "family": "resilience",
+      "family_label": "Resilience",
+      "family_description": "Explicit admission, isolation, retry, amplification, and failure policies.",
+      "family_order": 5,
       "version": "unreleased",
       "tag_prefix": "integration/consumers/v",
       "owned_dependencies": [
