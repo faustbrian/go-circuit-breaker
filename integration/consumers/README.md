@@ -27,8 +27,10 @@ discovery explicitly:
 GOWORK=off go test ./...
 ```
 
-From the repository root, the local-source run also participates in the
-aggregate gate:
+From the repository root, the aggregate gate performs module-isolated,
+pinned-release verification for this harness. The shared tooling runs module
+commands with `GOWORK=off`, so the harness does not resolve the workspace's local
+circuit-breaker source:
 
 ```sh
 make check
