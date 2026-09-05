@@ -12,13 +12,23 @@ the consumer catalog. Its supported toolchain is Go 1.26.6.
 
 ## Run the harness
 
-From this directory, run the complete suite:
+From this directory, run the complete suite against the repository's current
+root source through the intentional parent workspace:
 
 ```sh
 go test ./...
 ```
 
-From the repository root, the same module participates in the aggregate gate:
+To verify the exact released module versions pinned by this module instead of
+the parent workspace's local circuit-breaker source, disable workspace
+discovery explicitly:
+
+```sh
+GOWORK=off go test ./...
+```
+
+From the repository root, the local-source run also participates in the
+aggregate gate:
 
 ```sh
 make check
@@ -51,10 +61,12 @@ globals, or hidden initialization. A test-only atomic sequence gives each
 standard-library driver registration a unique name.
 
 Tests may run concurrently. The breaker owns its synchronized state and is
-shut down by test cleanup. The SQL database and returned rows remain owned and
-closed by the test caller. Context cancellation is passed through the public
-operation boundaries; the harness starts no goroutines and owns no independent
-drain or shutdown sequence.
+shut down by test cleanup. The harness and fake SQL driver start no goroutines
+directly, but `database/sql` owns a connection-opener goroutine and connection
+pool from `sql.Open` until cleanup calls `DB.Close`. The returned rows remain
+caller-owned and are closed by the test. Context cancellation is passed through
+the public operation boundaries; the harness owns no independent drain or
+shutdown sequence.
 
 Errors remain owned by their source packages. Assertions use `errors.Is` to
 distinguish local validation, JSON-RPC transport failure, the wrapped transport
