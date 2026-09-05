@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
+- Add the non-releasable consumer-integration module's engineering entry point,
+  including its evidence role, dependency direction, lifecycle, security, and
+  versioned ecosystem navigation without presenting it as installable. Its
+  guidance distinguishes local-workspace and pinned-release verification and
+  assigns the SQL connection pool and opener lifecycle to `database/sql`.
+
 - Publish the module's family, selection, ownership, lifecycle, support, and
   delivery metadata, and link the README to the immutable v1.4.0 ecosystem
   index and family guidance.
