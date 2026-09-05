@@ -180,7 +180,7 @@
       "module_path": "github.com/faustbrian/go-circuit-breaker/integration/consumers",
       "go_version": "1.26.6",
       "packages": [],
-      "purpose": "See the module README and goal files.",
+      "purpose": "Non-releasable interoperability harness proving circuit-breaker composition with database/sql and the Golib JSON-RPC client through public APIs. It owns engineering evidence only, not production APIs or protocol policy.",
       "lifecycle": "internal",
       "kind": "interoperability harness",
       "releasable": false,
