@@ -8,11 +8,12 @@ maintainer discretion.
 
 ## Reporting
 
-Report vulnerabilities privately through GitHub Security Advisories for this
-repository. Do not open a public issue containing exploit details, secrets, or
-customer data. Include affected versions, impact, reproduction, and a suggested
-fix if available. Maintainers aim to acknowledge reports within five business
-days and will coordinate disclosure after a fix is available.
+Report vulnerabilities through the repository's
+[private vulnerability reporting form](https://github.com/faustbrian/go-circuit-breaker/security/advisories/new).
+Do not open a public issue containing exploit details, secrets, or customer
+data. Include affected versions, impact, reproduction, and a suggested fix if
+available. Maintainers aim to acknowledge reports within five business days
+and will coordinate disclosure after a fix is available.
 
 ## Security guarantees
 

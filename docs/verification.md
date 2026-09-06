@@ -78,7 +78,7 @@ archives have SHA-256 checksums and GitHub artifact attestations.
 
 ## Compatibility
 
-Go 1.24 is the minimum tested version. The exported API is the stable v1
+Go 1.26.6 is the minimum supported and tested version. The exported API is the stable v1
 baseline. `make compatibility` installs a
 pinned `apidiff` through `make tools` and compares the entire prior module with
 the working tree. A tag pointing at the checked-out commit is excluded so a
@@ -108,3 +108,8 @@ cache and validation short circuits. The dependency remains one-way from the
 HTTP client to core.
 Remaining operational risks are caller-owned policy correctness and
 workload-specific tuning.
+
+Documentation examples are compiled and executed through the repository docs
+gate. The gate also validates local documentation links and public package
+documentation, so broken navigation and examples that stop handling public
+errors fail before release.

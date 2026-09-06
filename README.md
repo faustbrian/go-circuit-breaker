@@ -17,6 +17,9 @@ timeouts, retries, fallbacks, request bodies, errors, and protocol policy.
 Core uses only the standard library. There is no global registry, per-call
 goroutine, hidden retry, operation timeout, or distributed coordinator.
 
+The module is stable at v1, requires Go 1.26.6 or newer, and follows Semantic
+Versioning. Releases use root `vX.Y.Z` tags.
+
 ## Five-minute quickstart
 
 ```go
@@ -57,7 +60,10 @@ func main() {
 		// Apply a caller-owned fallback or return an availability response.
 		return
 	}
-	_ = value
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print(value)
 }
 
 func callCatalog(context.Context) (string, error) { return "available", nil }
@@ -106,7 +112,12 @@ totals.
 - [State-machine specification, threat model, and linearization](docs/design.md)
 - [Assurance, findings, ownership, and proof matrix](docs/assurance.md)
 - [Verification, benchmarks, compatibility, and release evidence](docs/verification.md)
+- [Troubleshooting and FAQ](docs/operations.md#troubleshooting-and-faq)
+- [Documentation index](docs/README.md)
+- [Compatibility policy](COMPATIBILITY.md)
+- [Support](SUPPORT.md)
 - [Security policy](SECURITY.md) and [contribution guide](CONTRIBUTING.md)
+- [Changelog](CHANGELOG.md)
 
 For ecosystem-wide selection and ownership guidance, see the versioned
 [Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md)
@@ -115,9 +126,8 @@ and its [Resilience family](https://github.com/faustbrian/go-library-tools/blob/
 ## Installation and support
 
 ```sh
-go get github.com/faustbrian/go-circuit-breaker
-make check
+go get github.com/faustbrian/go-circuit-breaker@v1
 ```
 
-The minimum supported toolchain is Go 1.24. See [SUPPORT.md](SUPPORT.md) for the
+The minimum supported toolchain is Go 1.26.6. See [SUPPORT.md](SUPPORT.md) for the
 compatibility policy. This project is licensed under the MIT License.

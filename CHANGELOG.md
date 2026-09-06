@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
+- Align the stable-v1 contract on Go 1.26.6, root release tags, executable
+  example error handling, FAQ metadata, and complete project navigation.
+- Add documentation link and example verification to the package-owned docs
+  gate, and correct support and private security-reporting routes.
+
 - Add the non-releasable consumer-integration module's engineering entry point,
   including its evidence role, dependency direction, lifecycle, security, and
   versioned ecosystem navigation without presenting it as installable. Its
