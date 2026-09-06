@@ -9,5 +9,6 @@ Use GitHub Discussions for adoption questions and design exploration. Use the
 private process in [`SECURITY.md`](SECURITY.md) for vulnerabilities.
 
 Support covers released module versions according to
-[`COMPATIBILITY.md`](COMPATIBILITY.md). Unreleased main-branch behavior may
-change while remediation gates are incomplete.
+[`COMPATIBILITY.md`](COMPATIBILITY.md). The module has a stable v1 release;
+unreleased main-branch changes remain subject to the compatibility policy until
+published.

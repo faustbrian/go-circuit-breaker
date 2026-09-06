@@ -8,19 +8,33 @@ import (
 )
 
 func ExampleCount() {
-	recent, _ := window.NewCount(2)
-	_ = recent.Add(window.Record{Class: window.Success})
-	_ = recent.Add(window.Record{Class: window.Failure, Slow: true})
-	_ = recent.Add(window.Record{Class: window.Ignored})
+	recent, err := window.NewCount(2)
+	if err != nil {
+		return
+	}
+	if err := recent.Add(window.Record{Class: window.Success}); err != nil {
+		return
+	}
+	if err := recent.Add(window.Record{Class: window.Failure, Slow: true}); err != nil {
+		return
+	}
+	if err := recent.Add(window.Record{Class: window.Ignored}); err != nil {
+		return
+	}
 	snapshot := recent.Snapshot()
 	fmt.Println(snapshot.Classified, snapshot.Failures, snapshot.SlowFailure, snapshot.Ignored)
 	// Output: 2 1 1 1
 }
 
 func ExampleTime() {
-	recent, _ := window.NewTime(time.Second, 2)
+	recent, err := window.NewTime(time.Second, 2)
+	if err != nil {
+		return
+	}
 	start := time.Unix(100, 0)
-	_ = recent.Add(start, window.Record{Class: window.Failure})
+	if err := recent.Add(start, window.Record{Class: window.Failure}); err != nil {
+		return
+	}
 	fmt.Println(recent.Snapshot(start).Failures)
 	fmt.Println(recent.Snapshot(start.Add(2 * time.Second)).Failures)
 	// Output:

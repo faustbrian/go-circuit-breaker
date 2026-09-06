@@ -149,7 +149,7 @@
           "compatibility": "COMPATIBILITY.md",
           "performance": "docs/verification.md",
           "examples": "example_test.go",
-          "faq": null,
+          "faq": "docs/operations.md",
           "changelog": "CHANGELOG.md",
           "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-circuit-breaker",
           "ecosystem_index": "https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md"

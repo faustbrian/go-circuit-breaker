@@ -12,7 +12,10 @@ import (
 )
 
 func ExampleExecute() {
-	circuit, _ := breaker.New(breaker.Config{Name: "catalog"})
+	circuit, err := breaker.New(breaker.Config{Name: "catalog"})
+	if err != nil {
+		return
+	}
 	result, err := breaker.Execute(context.Background(), circuit,
 		func(context.Context) (string, error) { return "available", nil })
 	fmt.Println(result, err)
@@ -20,51 +23,64 @@ func ExampleExecute() {
 }
 
 func ExampleBreaker_Acquire() {
-	circuit, _ := breaker.New(breaker.Config{Name: "stream"})
+	circuit, err := breaker.New(breaker.Config{Name: "stream"})
+	if err != nil {
+		return
+	}
 	permit, err := circuit.Acquire(context.Background())
 	if err != nil {
 		return
 	}
-	defer func() { _ = permit.Cancel() }()
-
-	_ = permit.Complete(breaker.OutcomeSuccess, false)
+	if err := permit.Complete(breaker.OutcomeSuccess, false); err != nil {
+		return
+	}
 	fmt.Println(circuit.Snapshot().Successes)
 	// Output: 1
 }
 
 func ExampleConfig_failureRate() {
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:              "database",
 		Window:            breaker.CountWindow{Size: 20},
 		MinimumThroughput: 2,
 		Opening:           &breaker.OpeningRules{FailureRatio: 0.5},
 		OpenDuration:      breaker.FixedOpenDuration(time.Minute),
 	})
+	if err != nil {
+		return
+	}
+	errUnavailable := errors.New("unavailable")
 	for range 2 {
-		_, _ = breaker.Execute(context.Background(), circuit,
+		_, err = breaker.Execute(context.Background(), circuit,
 			func(context.Context) (struct{}, error) {
-				return struct{}{}, errors.New("unavailable")
+				return struct{}{}, errUnavailable
 			})
+		if !errors.Is(err, errUnavailable) {
+			return
+		}
 	}
 	fmt.Println(circuit.Snapshot().State)
 	// Output: open
 }
 
 func ExampleConfig_timeWindowAndSlowCalls() {
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:              "search",
 		Window:            breaker.TimeWindow{BucketDuration: time.Second, BucketCount: 30},
 		MinimumThroughput: 10,
 		Opening:           &breaker.OpeningRules{SlowRatio: 0.8},
 		SlowCallDuration:  500 * time.Millisecond,
 	})
+	if err != nil {
+		return
+	}
 	snapshot := circuit.Snapshot()
 	fmt.Println(snapshot.WindowCapacity, snapshot.MinimumThroughput)
 	// Output: 30 10
 }
 
 func ExampleConfig_observer() {
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:              "payments",
 		MinimumThroughput: 1,
 		Opening:           &breaker.OpeningRules{FailureCount: 1},
@@ -74,34 +90,62 @@ func ExampleConfig_observer() {
 		},
 		EventDelivery: breaker.SynchronousEvents{},
 	})
-	_, _ = breaker.Execute(context.Background(), circuit,
+	if err != nil {
+		return
+	}
+	errDeclined := errors.New("declined upstream")
+	_, err = breaker.Execute(context.Background(), circuit,
 		func(context.Context) (struct{}, error) {
-			return struct{}{}, errors.New("declined upstream")
+			return struct{}{}, errDeclined
 		})
+	if !errors.Is(err, errDeclined) {
+		return
+	}
 	// Output: closed open policy-opened
 }
 
 func ExampleBreaker_ForceOpen() {
-	circuit, _ := breaker.New(breaker.Config{Name: "maintenance"})
-	_ = circuit.ForceOpen()
-	_, err := circuit.Acquire(context.Background())
+	circuit, err := breaker.New(breaker.Config{Name: "maintenance"})
+	if err != nil {
+		return
+	}
+	if err := circuit.ForceOpen(); err != nil {
+		return
+	}
+	_, err = circuit.Acquire(context.Background())
 	fmt.Println(errors.Is(err, breaker.ErrForceOpen))
-	_ = circuit.Release()
+	if err := circuit.Release(); err != nil {
+		return
+	}
 	// Output: true
 }
 
 func ExampleBreaker_SetMode() {
-	circuit, _ := breaker.New(breaker.Config{Name: "maintenance"})
-	_ = circuit.SetMode(breaker.ModeDisabled)
-	permit, _ := circuit.Acquire(context.Background())
-	_ = permit.Complete(breaker.OutcomeFailure, false)
+	circuit, err := breaker.New(breaker.Config{Name: "maintenance"})
+	if err != nil {
+		return
+	}
+	if err := circuit.SetMode(breaker.ModeDisabled); err != nil {
+		return
+	}
+	permit, err := circuit.Acquire(context.Background())
+	if err != nil {
+		return
+	}
+	if err := permit.Complete(breaker.OutcomeFailure, false); err != nil {
+		return
+	}
 	fmt.Println(circuit.Snapshot().Mode, circuit.Snapshot().Failures)
 
-	_ = circuit.SetMode(breaker.ModeIsolated)
-	_, err := circuit.Acquire(context.Background())
+	if err := circuit.SetMode(breaker.ModeIsolated); err != nil {
+		return
+	}
+	_, err = circuit.Acquire(context.Background())
 	fmt.Println(errors.Is(err, breaker.ErrIsolated))
 
-	_ = circuit.Reset()
+	if err := circuit.Reset(); err != nil {
+		return
+	}
 	fmt.Println(circuit.Snapshot().State, circuit.Snapshot().Mode)
 	// Output:
 	// disabled 0
@@ -111,22 +155,29 @@ func ExampleBreaker_SetMode() {
 
 func ExampleBreaker_Shutdown() {
 	var observed atomic.Uint64
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name: "events",
 		Observer: func(breaker.TransitionEvent) error {
 			observed.Add(1)
 			return nil
 		},
 	})
-	_ = circuit.ForceOpen()
-	_ = circuit.Shutdown(context.Background())
+	if err != nil {
+		return
+	}
+	if err := circuit.ForceOpen(); err != nil {
+		return
+	}
+	if err := circuit.Shutdown(context.Background()); err != nil {
+		return
+	}
 	fmt.Println(observed.Load())
 	// Output: 1
 }
 
 func ExampleConfig_halfOpenRecovery() {
 	clock := breakertest.NewClock(time.Unix(100, 0))
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:              "catalog",
 		Clock:             clock,
 		MinimumThroughput: 1,
@@ -137,20 +188,30 @@ func ExampleConfig_halfOpenRecovery() {
 			RequiredSuccesses: 1,
 		},
 	})
-	_, _ = breaker.Execute(context.Background(), circuit,
+	if err != nil {
+		return
+	}
+	errUnavailable := errors.New("unavailable")
+	_, err = breaker.Execute(context.Background(), circuit,
 		func(context.Context) (struct{}, error) {
-			return struct{}{}, errors.New("unavailable")
+			return struct{}{}, errUnavailable
 		})
+	if !errors.Is(err, errUnavailable) {
+		return
+	}
 	clock.Advance(time.Second)
-	_, _ = breaker.Execute(context.Background(), circuit,
+	_, err = breaker.Execute(context.Background(), circuit,
 		func(context.Context) (struct{}, error) { return struct{}{}, nil })
+	if err != nil {
+		return
+	}
 	fmt.Println(circuit.Snapshot().State)
 	// Output: closed
 }
 
 func ExampleConfig_exponentialOpenDuration() {
 	clock := breakertest.NewClock(time.Unix(100, 0))
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:              "catalog",
 		Clock:             clock,
 		MinimumThroughput: 1,
@@ -165,14 +226,24 @@ func ExampleConfig_exponentialOpenDuration() {
 			RequiredSuccesses: 1,
 		},
 	})
-	completeFailure := func() {
-		permit, _ := circuit.Acquire(context.Background())
-		_ = permit.Complete(breaker.OutcomeFailure, false)
+	if err != nil {
+		return
 	}
-	completeFailure()
+	completeFailure := func() bool {
+		permit, err := circuit.Acquire(context.Background())
+		if err != nil {
+			return false
+		}
+		return permit.Complete(breaker.OutcomeFailure, false) == nil
+	}
+	if !completeFailure() {
+		return
+	}
 	fmt.Println(circuit.Snapshot().CurrentOpenDuration)
 	clock.Advance(time.Second)
-	completeFailure()
+	if !completeFailure() {
+		return
+	}
 	fmt.Println(circuit.Snapshot().CurrentOpenDuration)
 	// Output:
 	// 1s
@@ -181,7 +252,7 @@ func ExampleConfig_exponentialOpenDuration() {
 
 func ExampleConfig_customClassifier() {
 	errLocal := errors.New("local validation")
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name: "catalog",
 		Classifier: func(completion breaker.Completion) breaker.Outcome {
 			if errors.Is(completion.Err, errLocal) {
@@ -190,7 +261,10 @@ func ExampleConfig_customClassifier() {
 			return breaker.OutcomeFailure
 		},
 	})
-	_, err := breaker.Execute(context.Background(), circuit,
+	if err != nil {
+		return
+	}
+	_, err = breaker.Execute(context.Background(), circuit,
 		func(context.Context) (struct{}, error) { return struct{}{}, errLocal })
 	fmt.Println(errors.Is(err, errLocal), circuit.Snapshot().Ignored)
 	// Output: true 1
@@ -201,14 +275,19 @@ func ExampleConfig_waitForProbe() {
 		Name:              "catalog",
 		HalfOpenAdmission: breaker.WaitForProbe{MaxWait: 250 * time.Millisecond},
 	}
-	circuit, _ := breaker.New(config)
+	circuit, err := breaker.New(config)
+	if err != nil {
+		return
+	}
 	fmt.Printf("%T\n", config.HalfOpenAdmission)
-	_ = circuit.Close()
+	if err := circuit.Close(); err != nil {
+		return
+	}
 	// Output: breaker.WaitForProbe
 }
 
 func ExampleConfig_combinedOpeningRules() {
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:              "search",
 		MinimumThroughput: 2,
 		Opening: &breaker.OpeningRules{
@@ -217,16 +296,24 @@ func ExampleConfig_combinedOpeningRules() {
 			Combination:  breaker.OpenWhenAll,
 		},
 	})
+	if err != nil {
+		return
+	}
 	for range 2 {
-		permit, _ := circuit.Acquire(context.Background())
-		_ = permit.Complete(breaker.OutcomeFailure, true)
+		permit, err := circuit.Acquire(context.Background())
+		if err != nil {
+			return
+		}
+		if err := permit.Complete(breaker.OutcomeFailure, true); err != nil {
+			return
+		}
 	}
 	fmt.Println(circuit.Snapshot().State)
 	// Output: open
 }
 
 func ExampleConfig_ignoredOutcomeBehavior() {
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:              "catalog",
 		MinimumThroughput: 2,
 		Opening: &breaker.OpeningRules{
@@ -234,13 +321,21 @@ func ExampleConfig_ignoredOutcomeBehavior() {
 			IgnoredBehavior:     breaker.ResetConsecutiveFailures,
 		},
 	})
+	if err != nil {
+		return
+	}
 	for _, outcome := range []breaker.Outcome{
 		breaker.OutcomeFailure,
 		breaker.OutcomeIgnored,
 		breaker.OutcomeFailure,
 	} {
-		permit, _ := circuit.Acquire(context.Background())
-		_ = permit.Complete(outcome, false)
+		permit, err := circuit.Acquire(context.Background())
+		if err != nil {
+			return
+		}
+		if err := permit.Complete(outcome, false); err != nil {
+			return
+		}
 	}
 	fmt.Println(circuit.Snapshot().State)
 	// Output: closed
@@ -248,7 +343,7 @@ func ExampleConfig_ignoredOutcomeBehavior() {
 
 func ExampleConfig_successRatioRecovery() {
 	clock := breakertest.NewClock(time.Unix(100, 0))
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:              "catalog",
 		Clock:             clock,
 		MinimumThroughput: 1,
@@ -260,16 +355,29 @@ func ExampleConfig_successRatioRecovery() {
 			FailureAction: breaker.ReopenAfterSample,
 		},
 	})
-	permit, _ := circuit.Acquire(context.Background())
-	_ = permit.Complete(breaker.OutcomeFailure, false)
+	if err != nil {
+		return
+	}
+	permit, err := circuit.Acquire(context.Background())
+	if err != nil {
+		return
+	}
+	if err := permit.Complete(breaker.OutcomeFailure, false); err != nil {
+		return
+	}
 	clock.Advance(time.Second)
 	for _, outcome := range []breaker.Outcome{
 		breaker.OutcomeSuccess,
 		breaker.OutcomeFailure,
 		breaker.OutcomeSuccess,
 	} {
-		permit, _ = circuit.Acquire(context.Background())
-		_ = permit.Complete(outcome, false)
+		permit, err = circuit.Acquire(context.Background())
+		if err != nil {
+			return
+		}
+		if err := permit.Complete(outcome, false); err != nil {
+			return
+		}
 	}
 	fmt.Println(circuit.Snapshot().State)
 	// Output: closed
@@ -280,7 +388,7 @@ type exampleRandom float64
 func (r exampleRandom) Float64() float64 { return float64(r) }
 
 func ExampleConfig_openDurationJitter() {
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:               "catalog",
 		MinimumThroughput:  1,
 		Opening:            &breaker.OpeningRules{FailureCount: 1},
@@ -288,15 +396,23 @@ func ExampleConfig_openDurationJitter() {
 		OpenDurationJitter: 0.5,
 		Random:             exampleRandom(0.5),
 	})
-	permit, _ := circuit.Acquire(context.Background())
-	_ = permit.Complete(breaker.OutcomeFailure, false)
+	if err != nil {
+		return
+	}
+	permit, err := circuit.Acquire(context.Background())
+	if err != nil {
+		return
+	}
+	if err := permit.Complete(breaker.OutcomeFailure, false); err != nil {
+		return
+	}
 	fmt.Println(circuit.Snapshot().CurrentOpenDuration)
 	// Output: 7.5s
 }
 
 func ExampleRejectExcessProbes() {
 	clock := breakertest.NewClock(time.Unix(100, 0))
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:              "catalog",
 		Clock:             clock,
 		MinimumThroughput: 1,
@@ -308,19 +424,38 @@ func ExampleRejectExcessProbes() {
 		},
 		HalfOpenAdmission: breaker.RejectExcessProbes{},
 	})
-	permit, _ := circuit.Acquire(context.Background())
-	_ = permit.Complete(breaker.OutcomeFailure, false)
+	if err != nil {
+		return
+	}
+	permit, err := circuit.Acquire(context.Background())
+	if err != nil {
+		return
+	}
+	if err := permit.Complete(breaker.OutcomeFailure, false); err != nil {
+		return
+	}
 	clock.Advance(time.Second)
-	probe, _ := circuit.Acquire(context.Background())
-	_, err := circuit.Acquire(context.Background())
+	probe, err := circuit.Acquire(context.Background())
+	if err != nil {
+		return
+	}
+	_, err = circuit.Acquire(context.Background())
 	fmt.Println(errors.Is(err, breaker.ErrHalfOpenExhausted))
-	_ = probe.Cancel()
+	if err := probe.Cancel(); err != nil {
+		return
+	}
 	// Output: true
 }
 
 func ExamplePermit_Cancel() {
-	circuit, _ := breaker.New(breaker.Config{Name: "stream"})
-	permit, _ := circuit.Acquire(context.Background())
+	circuit, err := breaker.New(breaker.Config{Name: "stream"})
+	if err != nil {
+		return
+	}
+	permit, err := circuit.Acquire(context.Background())
+	if err != nil {
+		return
+	}
 	fmt.Println(permit.Cancel())
 	fmt.Println(errors.Is(permit.Cancel(), breaker.ErrPermitCanceled))
 	// Output:
@@ -329,9 +464,14 @@ func ExamplePermit_Cancel() {
 }
 
 func ExampleRejectionError() {
-	circuit, _ := breaker.New(breaker.Config{Name: "catalog"})
-	_ = circuit.ForceOpen()
-	_, err := circuit.Acquire(context.Background())
+	circuit, err := breaker.New(breaker.Config{Name: "catalog"})
+	if err != nil {
+		return
+	}
+	if err := circuit.ForceOpen(); err != nil {
+		return
+	}
+	_, err = circuit.Acquire(context.Background())
 	var rejection *breaker.RejectionError
 	fmt.Println(errors.As(err, &rejection), rejection.Name, rejection.Mode)
 	// Output: true catalog force-open
@@ -339,12 +479,18 @@ func ExampleRejectionError() {
 
 func ExampleConfig_permitTTL() {
 	clock := breakertest.NewClock(time.Unix(100, 0))
-	circuit, _ := breaker.New(breaker.Config{
+	circuit, err := breaker.New(breaker.Config{
 		Name:      "stream",
 		Clock:     clock,
 		PermitTTL: time.Second,
 	})
-	permit, _ := circuit.Acquire(context.Background())
+	if err != nil {
+		return
+	}
+	permit, err := circuit.Acquire(context.Background())
+	if err != nil {
+		return
+	}
 	clock.Advance(time.Second)
 	fmt.Println(errors.Is(permit.Complete(breaker.OutcomeSuccess, false), breaker.ErrPermitExpired))
 	// Output: true

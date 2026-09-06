@@ -17,9 +17,16 @@ func ExampleClock() {
 }
 
 func ExampleRecorder() {
-	recorder, _ := breakertest.NewRecorder(1)
-	_ = recorder.Observe(breaker.TransitionEvent{Reason: breaker.ReasonPolicyOpened})
-	_ = recorder.Observe(breaker.TransitionEvent{Reason: breaker.ReasonReset})
+	recorder, err := breakertest.NewRecorder(1)
+	if err != nil {
+		return
+	}
+	if err := recorder.Observe(breaker.TransitionEvent{Reason: breaker.ReasonPolicyOpened}); err != nil {
+		return
+	}
+	if err := recorder.Observe(breaker.TransitionEvent{Reason: breaker.ReasonReset}); err != nil {
+		return
+	}
 	fmt.Println(recorder.Events()[0].Reason, recorder.Dropped())
 	recorder.Reset()
 	fmt.Println(len(recorder.Events()), recorder.Dropped())
