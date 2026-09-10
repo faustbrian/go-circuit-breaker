@@ -8,7 +8,7 @@ application configuration.
 
 The harness is an engineering-inventory module. It is not an installable
 library, is not published under semantic-version tags, and must not appear in
-the consumer catalog. Its supported toolchain is Go 1.26.6.
+the consumer catalog. Its supported toolchain is Go 1.27.0.
 
 ## Run the harness
 
@@ -100,7 +100,7 @@ installation, migration, deprecation, or independent support policy.
 
 ## Troubleshooting and FAQ
 
-If module resolution or checks fail, first confirm Go 1.26.6 is active and the
+If module resolution or checks fail, first confirm Go 1.27.0 is active and the
 checked-in `go.mod` and `go.sum` are unchanged. The deterministic SQL driver is
 intentional: no local PostgreSQL instance should be started. The JSON-RPC test
 also uses an in-memory transport, so a network request indicates a regression.

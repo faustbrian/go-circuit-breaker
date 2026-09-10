@@ -7,7 +7,7 @@
 [![Documentation](https://img.shields.io/badge/docs-checked_in_CI-blue)](docs/)
 [![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-circuit-breaker.svg)](https://pkg.go.dev/github.com/faustbrian/go-circuit-breaker)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-circuit-breaker?sort=semver)](https://github.com/faustbrian/go-circuit-breaker/releases)
-[![Go](https://img.shields.io/badge/go-1.26.6-00ADD8?logo=go)](https://go.dev/)
+[![Go](https://img.shields.io/badge/go-1.27.0-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 `circuit-breaker` is a protocol-neutral, bounded, concurrent circuit breaker
@@ -17,7 +17,7 @@ timeouts, retries, fallbacks, request bodies, errors, and protocol policy.
 Core uses only the standard library. There is no global registry, per-call
 goroutine, hidden retry, operation timeout, or distributed coordinator.
 
-The module is stable at v1, requires Go 1.26.6 or newer, and follows Semantic
+The module is stable at v1, requires Go 1.27.0 or newer, and follows Semantic
 Versioning. Releases use root `vX.Y.Z` tags.
 
 ## Five-minute quickstart
@@ -129,5 +129,5 @@ and its [Resilience family](https://github.com/faustbrian/go-library-tools/blob/
 go get github.com/faustbrian/go-circuit-breaker@v1
 ```
 
-The minimum supported toolchain is Go 1.26.6. See [SUPPORT.md](SUPPORT.md) for the
+The minimum supported toolchain is Go 1.27.0. See [SUPPORT.md](SUPPORT.md) for the
 compatibility policy. This project is licensed under the MIT License.
