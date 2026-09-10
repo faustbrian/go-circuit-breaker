@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
   "repository": "github.com/faustbrian/go-circuit-breaker",
-  "go_version": "1.26.6",
+  "go_version": "1.27.0",
   "modules": [
     {
       "directory": ".",
       "module_path": "github.com/faustbrian/go-circuit-breaker",
-      "go_version": "1.26.6",
+      "go_version": "1.27.0",
       "packages": [
         {
           "module_directory": ".",
@@ -131,7 +131,7 @@
           "github.com/faustbrian/go-semaphore"
         ],
         "supported_go": {
-          "minimum": "1.26.6",
+          "minimum": "1.27.0",
           "tested": [
             "1.27.0"
           ]
@@ -178,7 +178,7 @@
     {
       "directory": "integration/consumers",
       "module_path": "github.com/faustbrian/go-circuit-breaker/integration/consumers",
-      "go_version": "1.26.6",
+      "go_version": "1.27.0",
       "packages": [],
       "purpose": "Non-releasable interoperability harness proving circuit-breaker composition with database/sql and the Golib JSON-RPC client through public APIs. It owns engineering evidence only, not production APIs or protocol policy.",
       "lifecycle": "internal",

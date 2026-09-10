@@ -78,7 +78,7 @@ archives have SHA-256 checksums and GitHub artifact attestations.
 
 ## Compatibility
 
-Go 1.26.6 is the minimum supported and tested version. The exported API is the stable v1
+Go 1.27.0 is the minimum supported and tested version. The exported API is the stable v1
 baseline. `make compatibility` installs a
 pinned `apidiff` through `make tools` and compares the entire prior module with
 the working tree. A tag pointing at the checked-out commit is excluded so a
