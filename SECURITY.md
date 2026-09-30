@@ -22,3 +22,8 @@ Allocation-sized settings have hard bounds. Core contains no production
 `unsafe`, cgo, `go:linkname`, finalizers, network control plane, or third-party
 dependency. Required security checks are documented in
 [docs/verification.md](docs/verification.md).
+
+The versioned [security model v1](docs/security/threat-model-v1.md) records
+audited boundaries, exact-source evidence, and conditional caller-owned risks.
+The breaker is not a bulkhead: applications own concurrency, waiter count,
+execution deadlines, safe names, and trusted callback behavior.
