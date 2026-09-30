@@ -16,6 +16,7 @@
 - [Operations](operations.md)
 - [Assurance and findings](assurance.md)
 - [Verification](verification.md)
+- [Security model](security/threat-model-v1.md)
 - [Troubleshooting and FAQ](operations.md#troubleshooting-and-faq)
 
 ## Contributing
