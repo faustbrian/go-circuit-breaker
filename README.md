@@ -120,7 +120,7 @@ totals.
 - [Changelog](CHANGELOG.md)
 
 For ecosystem-wide selection and ownership guidance, see the versioned
-[Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md)
+[Golib ecosystem index](https://github.com/faustbrian/go-library-tools/tree/531e4db50fd81a7201257a7b488a0cf22d333aca/docs/ecosystem)
 and its [Resilience family](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/design-language.md#package-families-and-selection).
 
 ## Installation and support
