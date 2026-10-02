@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-02
+
 ### Changed
+
+- Raise the minimum supported Go version from 1.26.6 to 1.27.0.
+  Consumers using a fixed local toolchain must upgrade before adopting
+  this release.
 
 - Adopt the checksum-verified `go-library-tools` v1.4.0 CLI, schema-v2
   cohesion metadata, and repository-local `make cohesion` gate without
@@ -22,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- Align the stable-v1 contract on Go 1.26.6, root release tags, executable
+- Align the stable-v1 contract on Go 1.27.0, root release tags, executable
   example error handling, FAQ metadata, and complete project navigation.
 - Add documentation link and example verification to the package-owned docs
   gate, and correct support and private security-reporting routes.
@@ -64,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- Link the package README to package-owned documentation.
+- Link the package README to the repository-wide Golib documentation portal.
 
 ### Changed
 
