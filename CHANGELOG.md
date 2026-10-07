@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-10-07
+
+### Maintenance
+
+- Refresh the repository development TOML parser lock and the internal
+  JSON-RPC interoperability dependency without changing circuit-breaker
+  APIs or runtime behavior. The separately published documentation tooling
+  retains its existing embedded dependency lock.
+
 ## [1.0.1] - 2026-10-02
 
 ### Changed
