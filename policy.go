@@ -12,7 +12,7 @@ func openingDecision(
 	consecutiveFailures uint64,
 	snapshot window.Snapshot,
 ) bool {
-	if snapshot.Classified < uint64(minimumThroughput) {
+	if snapshot.Classified < uint64(minimumThroughput) { // #nosec G115 -- the sole production caller supplies positive normalized throughput.
 		return false
 	}
 

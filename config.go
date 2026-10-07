@@ -217,10 +217,10 @@ func normalizeConfig(config Config) (normalizedConfig, error) {
 		return normalizedConfig{}, err
 	}
 	if timeWindow == nil {
-		if opening.FailureCount > uint64(windowSize) {
+		if opening.FailureCount > uint64(windowSize) { // #nosec G115 -- normalizeWindow establishes a positive bounded count size on this branch.
 			return normalizedConfig{}, invalidConfig("Opening.FailureCount", "must not exceed count window size")
 		}
-		if opening.SlowCount > uint64(windowSize) {
+		if opening.SlowCount > uint64(windowSize) { // #nosec G115 -- normalizeWindow establishes a positive bounded count size on this branch.
 			return normalizedConfig{}, invalidConfig("Opening.SlowCount", "must not exceed count window size")
 		}
 	}
@@ -355,7 +355,7 @@ func (t systemTimer) C() <-chan time.Time { return t.Timer.C }
 
 type standardRandom struct{}
 
-func (standardRandom) Float64() float64 { return rand.Float64() }
+func (standardRandom) Float64() float64 { return rand.Float64() } // #nosec G404 -- used only for optional scheduling jitter, never cryptographic material.
 
 func defaultClassifier(completion Completion) Outcome {
 	if completion.Err != nil {

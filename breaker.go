@@ -446,7 +446,7 @@ func (b *Breaker) completeHalfOpenLocked(outcome Outcome, now time.Time, jitterS
 		return
 	}
 	if policy.SuccessRatio > 0 && b.halfOpenCompleted >= policy.MaxProbes {
-		if ratio(uint64(b.halfOpenSuccesses), uint64(b.halfOpenCompleted)) >= policy.SuccessRatio {
+		if ratio(uint64(b.halfOpenSuccesses), uint64(b.halfOpenCompleted)) >= policy.SuccessRatio { // #nosec G115 -- mutex-owned exactly-once completions keep both counters in [0, MaxProbes].
 			b.closeLocked(now, ReasonHalfOpenRecovered)
 		} else {
 			b.openLocked(now, ReasonHalfOpenFailed, jitterSample)

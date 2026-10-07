@@ -71,7 +71,7 @@ func (w *Time) Add(at time.Time, record Record) error {
 // Snapshot returns aggregates that have not expired as of at.
 func (w *Time) Snapshot(at time.Time) Snapshot {
 	current := w.observe(at)
-	oldest := current.subtract(uint64(len(w.buckets) - 1))
+	oldest := current.subtract(uint64(len(w.buckets) - 1)) // #nosec G115 -- NewTime fixes bucket count in [1, MaxBucketCount].
 
 	var snapshot Snapshot
 	for i := range w.buckets {
@@ -102,7 +102,7 @@ func bucketIDAt(at time.Time, duration time.Duration) bucketID {
 
 	if nanoseconds, ok := exactUnixNanoseconds(at); ok {
 		bucket := nanoseconds / int64(duration)
-		switch uint64(nanoseconds) >> 63 {
+		switch uint64(nanoseconds) /* #nosec G115 -- intentional signed representation conversion to inspect the sign bit. */ >> 63 {
 		case 1:
 			if nanoseconds%int64(duration) != 0 {
 				bucket--
@@ -112,15 +112,15 @@ func bucketIDAt(at time.Time, duration time.Duration) bucketID {
 	}
 
 	seconds := at.Unix()
-	nanoseconds := uint64(at.Nanosecond())
+	nanoseconds := uint64(at.Nanosecond()) // #nosec G115 -- time.Time.Nanosecond returns a value in [0, 999999999].
 	negative := false
-	switch uint64(seconds) >> 63 {
+	switch uint64(seconds) /* #nosec G115 -- intentional signed representation conversion to inspect the sign bit. */ >> 63 {
 	case 1:
 		negative = true
 	}
-	magnitudeSeconds := uint64(seconds)
+	magnitudeSeconds := uint64(seconds) // #nosec G115 -- a negative representation is replaced by its magnitude before use below.
 	if negative {
-		magnitudeSeconds = uint64(-(seconds + 1)) + 1
+		magnitudeSeconds = uint64(-(seconds + 1)) + 1 // #nosec G115 -- negative seconds make -(seconds+1) nonnegative, including MinInt64.
 	}
 	high, low := bits.Mul64(magnitudeSeconds, nanosecondsPerSecond)
 	if negative {
@@ -129,7 +129,7 @@ func bucketIDAt(at time.Time, duration time.Duration) bucketID {
 		high, low = add128(high, low, nanoseconds)
 	}
 
-	divisor := uint64(duration)
+	divisor := uint64(duration) // #nosec G115 -- observe supplies the private positive bucket duration validated by NewTime.
 	quotientHigh := high / divisor
 	quotientLow, remainder := bits.Div64(high%divisor, low, divisor)
 	if negative && remainder != 0 {
@@ -139,11 +139,11 @@ func bucketIDAt(at time.Time, duration time.Duration) bucketID {
 }
 
 func bucketIDFromInt64(value int64) bucketID {
-	switch uint64(value) >> 63 {
+	switch uint64(value) /* #nosec G115 -- intentional signed representation conversion to inspect the sign bit. */ >> 63 {
 	case 0:
-		return bucketID{low: uint64(value)}
+		return bucketID{low: uint64(value)} // #nosec G115 -- the zero sign bit establishes value is nonnegative.
 	}
-	return bucketID{negative: true, low: uint64(-(value + 1)) + 1}
+	return bucketID{negative: true, low: uint64(-(value + 1)) + 1} // #nosec G115 -- negative value makes -(value+1) nonnegative, including MinInt64.
 }
 
 func add128(high, low, value uint64) (uint64, uint64) {
@@ -226,7 +226,7 @@ func (w *Time) index(id bucketID) int {
 	if id.negative && remainder != 0 {
 		remainder = divisor - remainder
 	}
-	return int(remainder)
+	return int(remainder) // #nosec G115 -- modulo constructor-owned bucket count bounds remainder below MaxBucketCount (65536).
 }
 
 func merge(destination *Snapshot, source Snapshot) {
