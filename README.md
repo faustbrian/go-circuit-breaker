@@ -3,7 +3,7 @@
 [![CI](https://github.com/faustbrian/go-circuit-breaker/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/faustbrian/go-circuit-breaker/actions/workflows/ci.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-required-blue)](https://github.com/faustbrian/go-circuit-breaker/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-100%25_required-blue)](CONTRIBUTING.md#verification)
-[![Mutation](https://img.shields.io/badge/mutation-100%25_required-blue)](CONTRIBUTING.md#verification)
+[![Mutation](https://img.shields.io/badge/mutation-optional_local-blue)](CONTRIBUTING.md#verification)
 [![Documentation](https://img.shields.io/badge/docs-checked_in_CI-blue)](docs/)
 [![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-circuit-breaker.svg)](https://pkg.go.dev/github.com/faustbrian/go-circuit-breaker)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-circuit-breaker?sort=semver)](https://github.com/faustbrian/go-circuit-breaker/releases)
@@ -102,6 +102,15 @@ totals.
   never contains results or operation errors.
 - Use an `Observer` for transition events. Asynchronous delivery is bounded and
   must be stopped by its owner with `Breaker.Shutdown` or nonblocking `Close`.
+
+## Development
+
+Start with `go test ./...` or a focused package/test selector. `make check` and
+`make ci` use bounded checks with the public verifier declared in `.golib.yaml`,
+including named race assertions for half-open capacity, completion accounting,
+canceled timers and observer shutdown. See
+[contributor verification](CONTRIBUTING.md#verification) for focused fuzzing,
+optional local mutation and explicit full/release qualification.
 
 ## Documentation
 

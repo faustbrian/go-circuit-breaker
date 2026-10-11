@@ -2,23 +2,35 @@
 
 ## Reproducible commands
 
-`make check` is the local and CI aggregate. Its gates are:
+Ordinary development starts with `go test ./...` or a focused test selector.
+The public verifier declared in `.golib.yaml` supplies the bounded local route:
 
-```text
-make fmt vet lint test integration coverage race fuzz leak benchmark docs
-make safety compatibility
-actionlint .github/workflows/*.yml
+```sh
+make inventory
+make check
+make ci
 ```
 
-Coverage must be exactly 100.0% production statements. Race runs repeat every
-package three times. Seven fuzz targets cover configuration and resource
-bounds, execution outcomes/durations, permit/admin/observer sequences, count
+`make check` and `make ci` run bounded local checks, including one named race
+selection for half-open capacity, exactly-once completion, canceled-timer cleanup
+and observer drain. They do not run mutation or repeated lifecycle campaigns.
+Documentation changes select relevant structure, links and executable examples;
+security, workflow trust and failed required results remain enforced.
+
+`make check-full` retains full assurance selected for a material risk or release
+boundary. The configured full coverage threshold, repeated lifecycle operations
+and original fuzz budgets are unchanged. Seven fuzz targets cover configuration
+and resource bounds, execution outcomes/durations, permit/admin/observer sequences, count
 reference parity, and arbitrary time movement against an independent
 wide-integer model. Deterministic tests cover transition tables, ratios,
 concurrency, fake timers, injected-callback reentrancy/panic, observer
 reentrancy/panic, permit expiry, open-expiry operator races, and
-reference-model divergence. Leak checks repeat timer cancellation,
-stopped-timer retention, and observer shutdown.
+reference-model divergence. Explicit full lifecycle checks repeat timer
+cancellation, stopped-timer retention and observer shutdown. Focused 2s active
+fuzzing, optional one-package mutation and composition commands are documented in
+[CONTRIBUTING.md](../CONTRIBUTING.md#verification). Relevant release qualification
+uses `golib release dry-run --module .`; a bounded local pass is not release
+qualification and CI-only changes do not require a module release.
 
 ## Benchmark baseline
 
@@ -37,11 +49,12 @@ Recorded 2026-07-15 using Go 1.26.5, darwin/arm64, Apple M4 Max,
 | TimeRollover | 9.874 | 0 | 0 |
 | TimeSnapshot | 179.5 | 0 | 0 |
 
-These are regression evidence, not cross-machine latency guarantees. CI runs a
-short benchmark smoke; maintainers compare stable-runner history before release.
-Run `make profile` for reproducible CPU, allocation, and mutex profiles under
-`profiles/`; inspect them with `go tool pprof`. Generated profiles are evidence
-artifacts and are not committed.
+These are regression evidence, not cross-machine latency guarantees. Explicit
+full assurance retains benchmark smoke; maintainers compare stable-runner history
+before release when performance is affected. Targeted profiling uses Go's native
+benchmark selectors and CPU, allocation and mutex profile flags; inspect the
+result with `go tool pprof`. Generated profiles are disposable evidence artifacts
+and are not committed.
 
 ### Profile findings
 
@@ -70,19 +83,22 @@ their own atomic storage.
 The production module and its packages have no third-party module dependency.
 The nested consumer-integration test module pins `jsonrpc` without adding it
 to the production graph.
-`govulncheck ./...` and a pinned gitleaks tree scan are required locally; CI
-also scans full Git history. GO-SAFETY-1 rejects production `unsafe`, cgo,
+The verifier retains applicable vulnerability, secret and license checks.
+Ordinary changed-input scans do not substitute for full tree/history scans
+selected at a release or other relevant integrity boundary. GO-SAFETY-1 rejects
+production `unsafe`, cgo,
 `go:linkname`, and finalizers. Workflows use minimal permissions and
 commit-pinned actions; pull requests receive dependency review. Tagged source
 archives have SHA-256 checksums and GitHub artifact attestations.
 
 ## Compatibility
 
-Go 1.27.0 is the minimum supported and tested version. The exported API is the stable v1
-baseline. `make compatibility` installs a
-pinned `apidiff` through `make tools` and compares the entire prior module with
-the working tree. A tag pointing at the checked-out commit is excluded so a
-release cannot compare itself with itself. Exported types, defaults, state
+Go 1.27.0 remains the public module minimum; CI uses the patched Go 1.27.2
+producer. The exported API is the
+stable v1 baseline. The verifier's explicit full/API qualification consumes the
+configured `api/baseline.txt` compatibility contract. Public API changes also
+require affected semantic and direct-consumer assertions; a structural API
+comparison alone does not prove them. Exported types, defaults, state
 transitions, timing, classification, snapshots, and error identity are semantic
 compatibility surfaces.
 
