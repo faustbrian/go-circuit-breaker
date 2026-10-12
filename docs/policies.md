@@ -126,8 +126,8 @@ ordering. Backward bucket movement does not resurrect expired data.
 | --- | --- |
 | open admission before `NextProbeAt` | reject with `ErrOpen` |
 | open admission exactly at `NextProbeAt` | enter half-open once and apply probe capacity |
-| permit completion/cancel before TTL deadline | accept terminal action |
-| permit completion/cancel exactly at TTL deadline | expire and return `ErrPermitExpired` |
+| two-step permit completion/cancel before TTL deadline | accept terminal action |
+| two-step permit completion/cancel exactly at TTL deadline | expire and return `ErrPermitExpired` |
 | waiting capacity freed before absolute `MaxWait` | retry admission |
 | observed time reaches absolute `MaxWait` | reject with `ErrHalfOpenWaitTimeout`, even if timer delivery lags |
 | execution clock moves backward | elapsed duration is zero |

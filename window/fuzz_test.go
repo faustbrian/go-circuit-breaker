@@ -9,6 +9,10 @@ import (
 	"github.com/faustbrian/go-circuit-breaker/window"
 )
 
+// FuzzCountMatchesBoundedReference compares rings of 1..32 classified records
+// against a simple eviction reference over at most 4096 outcomes, preserving
+// cumulative ignored counts and slow subsets without treating invalid classes
+// as another outcome.
 func FuzzCountMatchesBoundedReference(f *testing.F) {
 	f.Add(uint8(3), []byte{0, 1, 2, 1, 0})
 	f.Fuzz(func(t *testing.T, rawSize uint8, outcomes []byte) {
@@ -57,6 +61,10 @@ func FuzzCountMatchesBoundedReference(f *testing.F) {
 	})
 }
 
+// FuzzTimeWindowTimestamps compares 1..32 buckets and positive sub-hour durations
+// against independent big.Int floor-division identities. At most 1024 outcomes
+// and 8192 timestamp bytes exercise signed Unix-second extremes, backward/idle
+// progress and optional insertion; this is arithmetic/retention, not a timer oracle.
 func FuzzTimeWindowTimestamps(f *testing.F) {
 	f.Add(
 		uint8(4),
@@ -154,6 +162,8 @@ func (r *timeReference) observe(at time.Time) *big.Int {
 	return new(big.Int).Set(r.last)
 }
 
+// Arbitrary-precision quotient/remainder plus explicit negative-floor adjustment
+// keeps the oracle independent of production's signed 128-bit ring arithmetic.
 func referenceBucketID(at time.Time, duration *big.Int) *big.Int {
 	nanoseconds := new(big.Int).Mul(big.NewInt(at.Unix()), big.NewInt(int64(time.Second)))
 	nanoseconds.Add(nanoseconds, big.NewInt(int64(at.Nanosecond())))

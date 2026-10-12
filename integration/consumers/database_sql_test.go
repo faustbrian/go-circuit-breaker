@@ -1,3 +1,6 @@
+// Package consumerintegration_test composes separately pinned released breaker
+// and protocol APIs without local source replacement. It models caller resource
+// and classification ownership, not a real database/remote-service qualification.
 package consumerintegration_test
 
 import (

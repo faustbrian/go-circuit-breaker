@@ -10,6 +10,8 @@ import (
 	"github.com/faustbrian/go-circuit-breaker/breakertest"
 )
 
+// BenchmarkClosedExecute times default classified success/result return with
+// system-clock sampling; ResetTimer excludes constructor/context setup.
 func BenchmarkClosedExecute(b *testing.B) {
 	circuit := mustBenchmarkBreaker(b, breaker.Config{Name: "benchmark"})
 	ctx := context.Background()
@@ -22,6 +24,8 @@ func BenchmarkClosedExecute(b *testing.B) {
 	}
 }
 
+// BenchmarkOpenRejection times repeated rejection during a one-hour open
+// interval; ResetTimer excludes constructor and opening completion.
 func BenchmarkOpenRejection(b *testing.B) {
 	circuit := mustBenchmarkBreaker(b, breaker.Config{
 		Name:              "benchmark",
@@ -39,6 +43,8 @@ func BenchmarkOpenRejection(b *testing.B) {
 	}
 }
 
+// BenchmarkSnapshot times parallel snapshots of an empty closed breaker;
+// ResetTimer excludes construction, not mutex/clock contention.
 func BenchmarkSnapshot(b *testing.B) {
 	circuit := mustBenchmarkBreaker(b, breaker.Config{Name: "benchmark"})
 	b.ReportAllocs()
@@ -50,6 +56,9 @@ func BenchmarkSnapshot(b *testing.B) {
 	})
 }
 
+// BenchmarkHalfOpenContention times parallel quota rejection with one held
+// synthetic-clock probe. ResetTimer excludes opening/advance/admission; it does
+// not measure recovery throughput.
 func BenchmarkHalfOpenContention(b *testing.B) {
 	clock := breakertest.NewClock(time.Unix(100, 0))
 	circuit := mustBenchmarkBreaker(b, breaker.Config{
@@ -75,6 +84,9 @@ func BenchmarkHalfOpenContention(b *testing.B) {
 	})
 }
 
+// BenchmarkSynchronousTransitionObserver times two administrative transitions
+// and callbacks per iteration; ResetTimer excludes construction. Compare with
+// async only after accounting for the different operation count.
 func BenchmarkSynchronousTransitionObserver(b *testing.B) {
 	circuit := mustBenchmarkBreaker(b, breaker.Config{
 		Name:          "benchmark",
@@ -89,6 +101,10 @@ func BenchmarkSynchronousTransitionObserver(b *testing.B) {
 	}
 }
 
+// BenchmarkAsynchronousTransitionObserver times one alternating administrative
+// transition/enqueue per iteration with a MaxEventBuffer queue. ResetTimer
+// excludes construction and StopTimer excludes drain; drops are permitted, so
+// this is not lossless callback throughput.
 func BenchmarkAsynchronousTransitionObserver(b *testing.B) {
 	var observed atomic.Uint64
 	circuit := mustBenchmarkBreaker(b, breaker.Config{

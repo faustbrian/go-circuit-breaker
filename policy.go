@@ -12,6 +12,7 @@ func openingDecision(
 	consecutiveFailures uint64,
 	snapshot window.Snapshot,
 ) bool {
+	// Throughput gates even consecutive rules; ignored outcomes are not evidence.
 	if snapshot.Classified < uint64(minimumThroughput) { // #nosec G115 -- the sole production caller supplies positive normalized throughput.
 		return false
 	}
@@ -40,6 +41,9 @@ func openingDecision(
 	return slices.Contains(decisions, true)
 }
 
+// Undefined ratios are numerically zero and separately marked in Snapshot.
+// Float64 conversion is deliberately shared by threshold decisions/diagnostics;
+// callers must not interpret it as exact rational arithmetic at huge counts.
 func ratio(numerator, denominator uint64) float64 {
 	if denominator == 0 {
 		return 0

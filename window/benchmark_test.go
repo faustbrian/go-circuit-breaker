@@ -7,6 +7,8 @@ import (
 	"github.com/faustbrian/go-circuit-breaker/window"
 )
 
+// BenchmarkCountRollover times serial failure/slow insertions into a 100-record
+// ring, including eviction once full; ResetTimer excludes construction.
 func BenchmarkCountRollover(b *testing.B) {
 	rolling, err := window.NewCount(100)
 	if err != nil {
@@ -20,6 +22,9 @@ func BenchmarkCountRollover(b *testing.B) {
 	}
 }
 
+// BenchmarkTimeRollover times insertion plus timestamp arithmetic into 60
+// one-second buckets, advancing one second per operation; ResetTimer excludes
+// construction.
 func BenchmarkTimeRollover(b *testing.B) {
 	rolling, err := window.NewTime(time.Second, 60)
 	if err != nil {
@@ -34,6 +39,9 @@ func BenchmarkTimeRollover(b *testing.B) {
 	}
 }
 
+// BenchmarkTimeSnapshot times serial fixed-timestamp scans of 60 filled
+// one-second buckets. ResetTimer excludes construction/fill; this does not
+// benchmark idle jumps or concurrent ownership.
 func BenchmarkTimeSnapshot(b *testing.B) {
 	rolling, err := window.NewTime(time.Second, 60)
 	if err != nil {

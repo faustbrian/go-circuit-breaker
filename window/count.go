@@ -2,7 +2,9 @@ package window
 
 import "fmt"
 
-// Count retains a fixed number of the most recent records.
+// Count retains a fixed number of the most recent classified records and a
+// separate cumulative ignored count. Obtain it from NewCount; do not copy its
+// mutable ring/aggregate state as independent windows. Zero is not configured.
 // Count is not safe for concurrent use; the owning breaker serializes access.
 type Count struct {
 	records  []Record
@@ -23,11 +25,16 @@ func NewCount(size int) (*Count, error) {
 	return &Count{records: make([]Record, size)}, nil
 }
 
-// Add records one completion, evicting the oldest retained completion when full.
+// Add records a valid classified completion, evicting the oldest classified
+// record when full. Ignored only increments the cumulative ignored total, without
+// storing/evicting a ring record or counting Slow. Invalid class leaves state
+// unchanged and returns an error. Caller serialization is required.
 func (w *Count) Add(record Record) error {
 	if !valid(record) {
 		return fmt.Errorf("window: unknown outcome class %d", record.Class)
 	}
+	// Ignored events are not dependency evidence and cannot evict classified
+	// samples (TestCountIgnoredOutcomesDoNotEvictClassifiedOutcomes).
 	if record.Class == Ignored {
 		w.snapshot.add(record)
 		return nil

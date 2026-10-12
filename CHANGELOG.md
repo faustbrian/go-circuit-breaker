@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+
+- Clarify classified half-open quota, lazy permit expiry, lifetime versus health
+  accounting, copied snapshots and borrowed collaborators. Document observer
+  shutdown/delivery, count ignored totals, wide time buckets and test-clock
+  semantics without changing admission, policies or the public API.
+
 ## [1.0.2] - 2026-10-07
 
 ### Maintenance

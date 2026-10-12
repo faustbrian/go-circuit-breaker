@@ -11,6 +11,9 @@ import (
 	"github.com/faustbrian/go-circuit-breaker/breakertest"
 )
 
+// FuzzConfigurationNeverPanics varies uint16 count/bucket/minimum inputs,
+// arbitrary float bits and int64 durations; construction must reject or succeed
+// without panic, not satisfy an external policy oracle.
 func FuzzConfigurationNeverPanics(f *testing.F) {
 	f.Add(uint16(10), uint16(5), uint64(0x3fe0000000000000), int64(time.Second), byte(0))
 	f.Add(uint16(0), uint16(0), math.Float64bits(math.NaN()), int64(-1), byte(255))
@@ -38,6 +41,9 @@ func FuzzConfigurationNeverPanics(f *testing.F) {
 	})
 }
 
+// FuzzPermitOperationSequences limits sequences to 1024 bytes, mutating
+// admission, completion, cancellation, synthetic time and admin state;
+// aggregate/generation/probe invariants are checked after each step.
 func FuzzPermitOperationSequences(f *testing.F) {
 	f.Add([]byte{0, 1, 2, 3, 4, 5, 6, 7})
 	f.Add([]byte{0, 0, 1, 1, 2, 2, 4, 4})
@@ -100,6 +106,9 @@ func FuzzPermitOperationSequences(f *testing.F) {
 	})
 }
 
+// FuzzObserverSequences limits synchronous transition sequences to 256 bytes and
+// injects observer reentrancy, errors and panics. It checks generation/failure
+// counters, not asynchronous scheduling or lossless delivery.
 func FuzzObserverSequences(f *testing.F) {
 	f.Add(byte(0), []byte{0, 1, 2, 3})
 	f.Add(byte(3), []byte{4, 5, 6, 7})
@@ -162,6 +171,9 @@ func FuzzObserverSequences(f *testing.F) {
 	})
 }
 
+// FuzzConfigurationResourceBounds bounds name corpus at 4096 bytes while varying
+// uint32/uint64 resource inputs and async delivery; successful constructors are
+// shut down, invalid limits must not trigger unbounded allocation.
 func FuzzConfigurationResourceBounds(f *testing.F) {
 	f.Add([]byte("inventory"), uint32(100), uint32(10), uint64(50), uint32(10), uint32(64), byte(0))
 	f.Add([]byte{}, uint32(math.MaxUint32), uint32(math.MaxUint32), uint64(math.MaxUint64), uint32(math.MaxUint32), uint32(math.MaxUint32), byte(255))
@@ -202,6 +214,10 @@ func FuzzConfigurationResourceBounds(f *testing.F) {
 	})
 }
 
+// FuzzExecutionDurationsAndOutcomes limits sequences to 1024 calls with a
+// matching count window, moves synthetic time forward/backward and returns
+// success/error/cancellation; every terminal call must contribute classified
+// evidence under the default classifier.
 func FuzzExecutionDurationsAndOutcomes(f *testing.F) {
 	f.Add([]byte{0, 1, 2, 3, 4, 5})
 	f.Fuzz(func(t *testing.T, sequence []byte) {

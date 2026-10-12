@@ -125,15 +125,16 @@ caller responsibilities.
 
 ## State invariants
 
-- Generation is nonzero and increments exactly once per committed transition.
+- Generation starts at one and increments once per committed transition using
+  ordinary `uint64` arithmetic; it is not a globally unique or distributed fence.
 - Active half-open probes are never negative or above `MaxProbes`.
 - Every successful two-step `Complete` and every terminal `Execute` increments
   exactly one lifetime outcome total. Duplicate, canceled, and abandoned
   two-step permits do not.
 - Only a current-generation recording permit mutates the health window or
   transition policy; stale and disabled permits cannot.
-- `Completed` equals `TotalSuccesses + TotalFailures + TotalIgnored` and never
-  exceeds `Admitted`.
+- Before counter wrap, `Completed` equals
+  `TotalSuccesses + TotalFailures + TotalIgnored` and never exceeds `Admitted`.
 - Classified count equals successes plus failures; ignored is separate.
 - Slow successes/failures are subsets of their corresponding outcome counts.
 - Open timing is populated only after policy opening and reset on recovery.

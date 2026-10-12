@@ -21,6 +21,8 @@ type bucketID struct {
 
 // Time retains aggregate records in a fixed number of duration buckets.
 // Time is not safe for concurrent use; the owning breaker serializes access.
+// Obtain it from NewTime, do not copy mutable bucket state, and synchronize both
+// Add and Snapshot. Buckets align to the Unix epoch; no background expiry runs.
 type Time struct {
 	bucketDuration time.Duration
 	buckets        []timeBucket
@@ -51,7 +53,10 @@ func NewTime(bucketDuration time.Duration, bucketCount int) (*Time, error) {
 
 // Add records a completion in the bucket containing at. Timestamps older than
 // the latest observed timestamp are clamped so clock movement cannot resurrect
-// expired data.
+// expired data. Clamping is to the latest observed bucket identity, including
+// progress established by Snapshot, not to an exact last input timestamp.
+// Invalid class leaves state unchanged; every class, including Ignored, expires
+// with its bucket. Source timestamps contain no context/cancellation policy.
 func (w *Time) Add(at time.Time, record Record) error {
 	if !valid(record) {
 		return fmt.Errorf("window: unknown outcome class %d", record.Class)
@@ -68,7 +73,10 @@ func (w *Time) Add(at time.Time, record Record) error {
 	return nil
 }
 
-// Snapshot returns aggregates that have not expired as of at.
+// Snapshot returns copied aggregates for current minus BucketCount-1 through
+// current, inclusive. It advances observed bucket progress even without Add;
+// later backward Add/Snapshot cannot resurrect expired buckets. It scans the
+// fixed bucket ring, not every elapsed interval, and requires serialization.
 func (w *Time) Snapshot(at time.Time) Snapshot {
 	current := w.observe(at)
 	oldest := current.subtract(uint64(len(w.buckets) - 1)) // #nosec G115 -- NewTime fixes bucket count in [1, MaxBucketCount].
@@ -97,6 +105,9 @@ func (w *Time) observe(at time.Time) bucketID {
 	return w.lastBucketID
 }
 
+// Bucket identity is mathematical floor, including fractional pre-epoch time.
+// UnixNano is only exact inside int64 nanoseconds; wide sign/magnitude arithmetic
+// preserves distinct buckets outside that range (big.Int oracle in invariant tests).
 func bucketIDAt(at time.Time, duration time.Duration) bucketID {
 	const nanosecondsPerSecond = uint64(time.Second)
 
@@ -220,6 +231,8 @@ func exactUnixNanoseconds(at time.Time) (int64, bool) {
 	}
 }
 
+// Positive mathematical modulo maps negative bucket IDs into the same ring
+// geometry without aliasing their signed identities during expiry comparisons.
 func (w *Time) index(id bucketID) int {
 	divisor := uint64(len(w.buckets))
 	_, remainder := bits.Div64(id.high%divisor, id.low, divisor)

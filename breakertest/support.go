@@ -7,7 +7,9 @@ import (
 	breaker "github.com/faustbrian/go-circuit-breaker"
 )
 
-// Recorder is a bounded, concurrency-safe transition observer for tests.
+// Recorder is a concurrency-safe observer retaining caller-selected capacity.
+// Use NewRecorder, not its zero value. Returned events are copied value snapshots;
+// arrival order is delivery order, not a guarantee of breaker generation order.
 type Recorder struct {
 	mu       sync.Mutex
 	events   []breaker.TransitionEvent
@@ -15,7 +17,8 @@ type Recorder struct {
 	dropped  uint64
 }
 
-// NewRecorder constructs a recorder that keeps the most recent capacity events.
+// NewRecorder keeps the most recent positive capacity events. There is no hard
+// allocation maximum here; tests choose a trusted capacity before allocation.
 func NewRecorder(capacity int) (*Recorder, error) {
 	if capacity <= 0 {
 		return nil, fmt.Errorf("breakertest: recorder capacity must be greater than zero")
@@ -71,7 +74,9 @@ type ScriptedClassifier struct {
 	next     int
 }
 
-// NewScriptedClassifier constructs a concurrency-safe scripted classifier.
+// NewScriptedClassifier constructs a concurrency-safe classifier, copying the
+// outcomes slice. It intentionally permits invalid Outcome values to exercise
+// Execute's failure path. Its zero value falls back to OutcomeSuccess.
 func NewScriptedClassifier(
 	fallback breaker.Outcome,
 	outcomes ...breaker.Outcome,

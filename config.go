@@ -25,18 +25,27 @@ const (
 	MaxNameBytes = 256
 )
 
-// WindowConfig selects a bounded rolling outcome window.
+// WindowConfig selects a bounded rolling outcome window. Only CountWindow and
+// TimeWindow values are supported; nil selects CountWindow{Size: 100}. Their
+// pointers are not alternate configurations, despite promoted marker methods.
 type WindowConfig interface{ windowConfig() }
 
-// CountWindow retains the most recent Size outcomes.
-type CountWindow struct{ Size int }
+// CountWindow retains the most recent Size classified outcomes, while ignored
+// completions accumulate separately without evicting them.
+type CountWindow struct {
+	// Size must be positive and at most window.MaxCountSize; zero is invalid.
+	Size int
+}
 
 func (CountWindow) windowConfig() {}
 
 // TimeWindow retains aggregates in a bounded number of fixed-duration buckets.
 type TimeWindow struct {
+	// BucketDuration is positive; BucketDuration*BucketCount must fit time.Duration.
 	BucketDuration time.Duration
-	BucketCount    int
+	// BucketCount is positive and at most window.MaxBucketCount. Buckets, not
+	// requests, bound allocation; each aggregates potentially many outcomes.
+	BucketCount int
 }
 
 func (TimeWindow) windowConfig() {}
@@ -45,7 +54,9 @@ func (TimeWindow) windowConfig() {}
 type RuleCombination uint8
 
 const (
+	// OpenWhenAny opens when at least one enabled rule is satisfied.
 	OpenWhenAny RuleCombination = iota
+	// OpenWhenAll opens only when every enabled rule is satisfied.
 	OpenWhenAll
 )
 
@@ -54,38 +65,60 @@ const (
 type IgnoredConsecutiveBehavior uint8
 
 const (
+	// PreserveConsecutiveFailures leaves the failure streak unchanged on ignored calls.
 	PreserveConsecutiveFailures IgnoredConsecutiveBehavior = iota
+	// ResetConsecutiveFailures clears the streak on ignored calls.
 	ResetConsecutiveFailures
 )
 
 // OpeningRules contains policy thresholds. Zero disables an individual rule.
-// Ratios are expressed in the inclusive range (0, 1].
+// Enabled ratios are in (0, 1]; all rules also require MinimumThroughput.
 type OpeningRules struct {
+	// ConsecutiveFailures opens at this failure streak; zero disables it.
 	ConsecutiveFailures uint64
-	FailureCount        uint64
-	FailureRatio        float64
-	SlowCount           uint64
-	SlowRatio           float64
-	Combination         RuleCombination
-	IgnoredBehavior     IgnoredConsecutiveBehavior
+	// FailureCount opens at this many retained failures; zero disables it.
+	FailureCount uint64
+	// FailureRatio compares failures/classified using float64; zero disables it.
+	FailureRatio float64
+	// SlowCount compares retained slow successes plus failures; zero disables it.
+	SlowCount uint64
+	// SlowRatio compares slow/classified using float64; zero disables it.
+	SlowRatio float64
+	// Combination selects any (zero) or all enabled rules; unknown values fail.
+	Combination RuleCombination
+	// IgnoredBehavior preserves (zero) or resets the failure streak on ignored outcomes.
+	IgnoredBehavior IgnoredConsecutiveBehavior
 }
 
-// OpenDurationPolicy selects a bounded schedule for policy-driven openings.
+// OpenDurationPolicy selects a schedule for policy-driven openings. Supported
+// values are FixedOpenDuration and ExponentialOpenDuration, not their pointers;
+// nil selects a fixed 30 seconds. Recovery/reset clears the opening attempt count.
 type OpenDurationPolicy interface{ openDurationPolicy() }
 
-// Random supplies deterministic samples in the range [0, 1) for jitter.
-type Random interface{ Float64() float64 }
+// Random supplies samples for optional downward scheduling jitter, not security.
+// It is borrowed, may be called concurrently/outside the state mutex, and can be
+// called even when a completion does not ultimately open the breaker.
+type Random interface {
+	// Float64 should return [0, 1). Negative samples clamp to zero; non-finite,
+	// >=1 or panicking samples use zero, leaving duration unjittered.
+	Float64() float64
+}
 
 // FixedOpenDuration uses the same positive duration for every opening.
 type FixedOpenDuration time.Duration
 
 func (FixedOpenDuration) openDurationPolicy() {}
 
-// ExponentialOpenDuration grows on each reopening and is capped at Maximum.
+// ExponentialOpenDuration grows on each policy opening until recovery/reset,
+// capped at Maximum. Multiplication uses float64 then duration truncation, not
+// exact integer exponentiation; jitter is applied after selecting the schedule.
 type ExponentialOpenDuration struct {
-	Initial    time.Duration
+	// Initial is the positive first-opening duration.
+	Initial time.Duration
+	// Multiplier is finite and at least one; one keeps Initial for every opening.
 	Multiplier float64
-	Maximum    time.Duration
+	// Maximum is at least Initial and caps the pre-jitter schedule.
+	Maximum time.Duration
 }
 
 func (ExponentialOpenDuration) openDurationPolicy() {}
@@ -94,72 +127,141 @@ func (ExponentialOpenDuration) openDurationPolicy() {}
 type HalfOpenFailureAction uint8
 
 const (
+	// ReopenImmediately opens on the first classified failure in the probe sample.
 	ReopenImmediately HalfOpenFailureAction = iota
+	// ReopenAfterSample defers failure until the classified sample fills, unless
+	// the configured success threshold recovers earlier.
 	ReopenAfterSample
 )
 
-// HalfOpenPolicy bounds probes and selects exactly one recovery threshold.
+// HalfOpenPolicy bounds active plus classified-completed probes in one generation
+// and selects exactly one recovery threshold. Ignored/canceled/expired probes
+// release capacity without consuming classified quota. Slow flags do not affect
+// half-open recovery and these outcomes do not alter the retained health window.
 type HalfOpenPolicy struct {
-	MaxProbes         int
+	// MaxProbes is positive through MaxHalfOpenProbes, bounding classified
+	// completions plus active probes, not only simultaneous work.
+	MaxProbes int
+	// RequiredSuccesses selects count recovery when positive, at most MaxProbes;
+	// nonpositive disables count recovery when SuccessRatio is enabled.
 	RequiredSuccesses int
-	SuccessRatio      float64
-	FailureAction     HalfOpenFailureAction
+	// SuccessRatio selects recovery at a full classified MaxProbes sample when
+	// positive, at most one; zero disables it. Exactly one threshold must be enabled.
+	SuccessRatio float64
+	// FailureAction reopens immediately (zero) or after the sample; unknown values fail.
+	FailureAction HalfOpenFailureAction
 }
 
-// HalfOpenAdmissionPolicy controls excess callers while probe capacity is full.
+// HalfOpenAdmissionPolicy controls excess callers while probe quota is full.
+// Supported values are RejectExcessProbes (also the nil default) and WaitForProbe;
+// pointers are unsupported. It does not bound total closed-state concurrency.
 type HalfOpenAdmissionPolicy interface{ halfOpenAdmissionPolicy() }
 
-// RejectExcessProbes rejects callers immediately when all probes are active.
+// RejectExcessProbes rejects immediately when active plus classified-completed
+// probes fill the half-open quota.
 type RejectExcessProbes struct{}
 
 func (RejectExcessProbes) halfOpenAdmissionPolicy() {}
 
 // WaitForProbe waits context-sensitively for capacity up to MaxWait.
-type WaitForProbe struct{ MaxWait time.Duration }
+type WaitForProbe struct {
+	// MaxWait is positive and bounds the whole wait, including admission retries.
+	// Context cancellation can end it sooner; one borrowed-clock timer is stopped
+	// on return. It does not guarantee scheduling fairness or callback deadlines.
+	MaxWait time.Duration
+}
 
 func (WaitForProbe) halfOpenAdmissionPolicy() {}
 
-// Clock supplies deterministic wall and monotonic-capable timestamps.
+// Clock supplies shared timestamps and admission timers. It is borrowed for the
+// Breaker lifetime; providers own concurrent safety/coherent time and run outside
+// the state mutex. No deadline/recovery is imposed on provider calls. Backward
+// operation duration clamps to zero; rolling time buckets clamp observed progress.
 type Clock interface {
+	// Now returns the current timestamp; it must not require the state mutex.
 	Now() time.Time
+	// NewTimer returns an owned nonnil timer usable concurrently with clock calls.
+	// Acquire stops it on every return path after successful construction.
 	NewTimer(time.Duration) Timer
 }
 
-// Timer is the minimal clock-owned timer used by context-aware admission.
+// Timer is the minimal provider-owned timer used by context-aware admission.
+// Its receive channel stays usable until Stop; providers must not close it early
+// as closure would be observed as an admission timeout. No timer reset is needed.
 type Timer interface {
+	// C returns a stable receive channel for timer expiry notification.
 	C() <-chan time.Time
+	// Stop releases/prevents pending timer activity and reports whether stopped
+	// before expiry; it need not drain a notification already sent.
 	Stop() bool
 }
 
 // Completion is the ephemeral input to an outcome classifier. Implementations
 // must not retain Context, Result, or Err after returning.
 type Completion struct {
-	Context  context.Context
-	Result   any
-	Err      error
+	// Context is the operation caller context, borrowed for classifier use only.
+	Context context.Context
+	// Result is the original operation result; do not retain it.
+	Result any
+	// Err is the original operation error, not a redacted diagnostic; do not retain it.
+	Err error
+	// Duration is elapsed operation time, clamped at zero for backward clocks.
 	Duration time.Duration
 }
 
-// Classifier maps one admitted completion to exactly one outcome.
+// Classifier maps an admitted completion to one Outcome synchronously outside
+// the mutex. It is borrowed and must be safe when Execute calls overlap, retain
+// no Completion data and supply its own blocking policy. Nil selects success for
+// nil Err and failure otherwise (including typed-nil error interfaces). Invalid
+// enums fail completion; panics are failure-recorded and re-panicked by Execute.
 type Classifier func(Completion) Outcome
 
-// Config contains immutable breaker construction parameters.
+// Config contains breaker construction parameters. New copies value policies,
+// not collaborator state. Keep borrowed Clock/Random/Classifier/Observer valid and
+// concurrently safe for the breaker/worker lifetime. This is not a request budget.
 type Config struct {
-	Name               string
-	Window             WindowConfig
-	MinimumThroughput  int
-	SlowCallDuration   time.Duration
-	Opening            *OpeningRules
-	OpenDuration       OpenDurationPolicy
-	HalfOpen           *HalfOpenPolicy
-	Clock              Clock
-	Classifier         Classifier
-	PermitTTL          time.Duration
-	HalfOpenAdmission  HalfOpenAdmissionPolicy
-	Observer           Observer
-	EventDelivery      EventDeliveryPolicy
+	// Name is retained identity: nonempty, at most MaxNameBytes. It is rendered
+	// in snapshots/events/rejections, not validated as a secret-safe label.
+	Name string
+	// Window selects classified count/time storage; nil chooses 100 count records.
+	Window WindowConfig
+	// MinimumThroughput is positive classified evidence required by every rule;
+	// zero selects 10. Count windows require it not to exceed Size.
+	MinimumThroughput int
+	// SlowCallDuration is a positive inclusive elapsed-time threshold; zero
+	// selects 30 seconds. Ignored outcomes never count as slow.
+	SlowCallDuration time.Duration
+	// Opening is copied; nil selects failure ratio 0.5 with OpenWhenAny. A
+	// non-nil zero policy is invalid because at least one rule must be enabled.
+	Opening *OpeningRules
+	// OpenDuration selects fixed/exponential policy; nil selects 30 seconds.
+	OpenDuration OpenDurationPolicy
+	// HalfOpen is copied; nil selects ten probes, ten required successes and
+	// immediate failure reopening. A non-nil zero policy is invalid.
+	HalfOpen *HalfOpenPolicy
+	// Clock is borrowed; nil selects the system clock and typed nil is invalid.
+	Clock Clock
+	// Classifier is borrowed; nil classifies any nonnil error as failure.
+	Classifier Classifier
+	// PermitTTL is positive; zero selects five minutes. Manual permits expire
+	// without outcomes; internally owned Execute permits retain lifetime accounting.
+	// Expiry is lazy bookkeeping, never operation cancellation.
+	PermitTTL time.Duration
+	// HalfOpenAdmission defaults to fail-fast excess rejection; WaitForProbe
+	// adds finite caller-context-sensitive waiting, not a global queue bound.
+	HalfOpenAdmission HalfOpenAdmissionPolicy
+	// Observer is borrowed; nil disables events. Async mode may start a worker
+	// at construction; captures must be ready before the first transition callback.
+	Observer Observer
+	// EventDelivery requires Observer. Nil with an observer chooses async
+	// buffer 64/DropNewestEvent. Synchronous delivery has no worker to shut down.
+	EventDelivery EventDeliveryPolicy
+	// OpenDurationJitter is finite in [0, 1); zero disables sampling. Jitter
+	// only shortens the selected interval, with a one-nanosecond lower bound.
 	OpenDurationJitter float64
-	Random             Random
+	// Random is borrowed for jitter; nil selects math/rand/v2, typed nil fails.
+	// This is scheduling randomness, not cryptographic material.
+	Random Random
 }
 
 type normalizedConfig struct {

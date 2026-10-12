@@ -21,6 +21,7 @@
 
 ## Contributing
 
+- [Source documentation audit](source-documentation-audit.md)
 - [Contribution guide](../CONTRIBUTING.md)
 - [Compatibility policy](../COMPATIBILITY.md)
 - [Support](../SUPPORT.md)
