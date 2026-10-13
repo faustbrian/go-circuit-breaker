@@ -1,5 +1,7 @@
 # Verification and release evidence
 
+[Documentation index](README.md) · [Repository entry](../README.md)
+
 ## Reproducible commands
 
 Ordinary development starts with `go test ./...` or a focused test selector.
@@ -129,3 +131,6 @@ Documentation examples are compiled and executed through the repository docs
 gate. The gate also validates local documentation links and public package
 documentation, so broken navigation and examples that stop handling public
 errors fail before release.
+
+Choose the next guide in the [documentation index](README.md)
+or return to the [repository entry](../README.md) for installation and ownership.

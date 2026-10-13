@@ -1,5 +1,7 @@
 # API and configuration reference
 
+[Documentation index](README.md) · [Repository entry](../README.md)
+
 `New(Config)` validates the entire configuration before traffic is admitted and
 copies all value configuration into immutable internal state. A classifier,
 clock, random source, and observer are caller-owned functions/interfaces and
@@ -124,3 +126,6 @@ contains only breaker identity, state, mode, generation, and retry time.
 The `window` package exposes bounded `Count` and `Time` structures. The
 `breakertest` package exposes a deterministic clock/timer, bounded transition
 recorder, and scripted classifier.
+
+Choose the next guide in the [documentation index](README.md)
+or return to the [repository entry](../README.md) for installation and ownership.

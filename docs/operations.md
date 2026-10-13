@@ -1,5 +1,7 @@
 # Operations, observability, and incident response
 
+[Documentation index](README.md) · [Repository entry](../README.md)
+
 ## Metrics and events
 
 Poll immutable snapshots at an operator-chosen interval. Recommended
@@ -105,3 +107,6 @@ When replacing an existing breaker, first match its unit of observation
 half-open recovery, and cancellation behavior. Deploy metrics-only comparison
 where possible, then enable admission. Treat changed defaults, timing,
 classifiers, error identity, transitions, and snapshots as semantic API changes.
+
+Choose the next guide in the [documentation index](README.md)
+or return to the [repository entry](../README.md) for installation and ownership.

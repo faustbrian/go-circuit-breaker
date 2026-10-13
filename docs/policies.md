@@ -1,5 +1,7 @@
 # Policies, truth tables, and classification
 
+[Documentation index](README.md) · [Repository entry](../README.md)
+
 ## Closed-state opening
 
 Every enabled rule is evaluated only after classified outcomes reach minimum
@@ -134,3 +136,6 @@ ordering. Backward bucket movement does not resurrect expired data.
 | jitter sample in `[0, 1)` | shorten duration by at most configured jitter |
 | jitter panic, non-finite, or out-of-range sample | use unjittered duration |
 | injected clock/timer/random callback | execute before or after, never while holding the state mutex |
+
+Choose the next guide in the [documentation index](README.md)
+or return to the [repository entry](../README.md) for installation and ownership.

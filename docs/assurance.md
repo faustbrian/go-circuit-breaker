@@ -1,5 +1,7 @@
 # Assurance and findings
 
+[Documentation index](README.md) · [Repository entry](../README.md)
+
 This document records the hostile-concurrency findings and resulting
 guarantees. It complements
 the normative state machine in [design.md](design.md), the policy truth tables
@@ -151,3 +153,6 @@ at 9.874 and 179.5 ns/op); correctness takes priority over the old overflowing
 implementation. Observer and window storage stay fixed by configuration, and
 no request result, error, goroutine, timer, or history is retained per completed
 execution.
+
+Choose the next guide in the [documentation index](README.md)
+or return to the [repository entry](../README.md) for installation and ownership.

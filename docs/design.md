@@ -1,5 +1,7 @@
 # State-machine specification and threat model
 
+[Documentation index](README.md) · [Repository entry](../README.md)
+
 ## Transition table
 
 | From | Condition | To | Window | Generation |
@@ -139,3 +141,6 @@ caller responsibilities.
 - Slow successes/failures are subsets of their corresponding outcome counts.
 - Open timing is populated only after policy opening and reset on recovery.
 - Observer code never runs under the state lock.
+
+Choose the next guide in the [documentation index](README.md)
+or return to the [repository entry](../README.md) for installation and ownership.

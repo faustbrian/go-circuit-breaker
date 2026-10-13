@@ -1,5 +1,7 @@
 # Composition and integration
 
+[Documentation index](README.md) · [Repository entry](../README.md)
+
 Composition is ordered. The breaker observes exactly the dependency boundary
 the caller places inside `Execute` or between permit acquisition/completion.
 
@@ -103,3 +105,6 @@ Remote filesystem gateway failures may be dependency failures; local path
 validation and permission policy often are not. Two-step permits fit callbacks,
 streaming, or async APIs that cannot live in one function, provided every permit
 is completed or canceled within its finite TTL.
+
+Choose the next guide in the [documentation index](README.md)
+or return to the [repository entry](../README.md) for installation and ownership.

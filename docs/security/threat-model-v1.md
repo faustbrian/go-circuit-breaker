@@ -1,5 +1,7 @@
 # Security model v1
 
+[Documentation index](../README.md) · [Repository entry](../../README.md)
+
 Model version: 1. Reviewed on 2026-09-30 against source
 `a3fbf2ba4f3a758e49baf2fe3ec9b40773ff5ffd`, Go 1.27, latest public release
 `v1.0.0`. This documents existing behavior, not future source or the security
@@ -100,3 +102,6 @@ and coordinated disclosure under [SECURITY.md](../../SECURITY.md). Review this
 model after changes to admission, windows, permits, collaborators, diagnostics,
 consumers, dependencies or release automation; increment its version when
 assumptions or dispositions materially change.
+
+Choose the next guide in the [documentation index](../README.md)
+or return to the [repository entry](../../README.md) for installation and ownership.
